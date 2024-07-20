@@ -330,8 +330,8 @@ clean:
 
 .PHONY: deb
 deb-%:
-	cargo deb --target=$(TARGET) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
+	cargo deb --target=$(TARGET) -p containerd-shim-$* $(FEATURES_$*)
 
 .PHONY: rpm
 rpm-%:
-	cargo generate-rpm $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
+	cargo generate-rpm $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*)
