@@ -328,17 +328,10 @@ clean:
 	-$(MAKE) test/k8s/clean
 	-$(MAKE) test/k3s/clean
 
+.PHONY: deb
 deb-%:
-	ifeq ($(CARGO),cross)
-		$(error "cross does not support the deb subcommand, use cargo instead")
-	else
-		$(CARGO) deb $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
-	endif
+	cargo deb $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
 
 .PHONY: rpm
-deb-%:
-	ifeq ($(CARGO),cross)
-		$(error "cross does not support the deb subcommand, use cargo instead")
-	else
-		$(CARGO) generate-rpm $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
-	endif
+rpm-%:
+	cargo generate-rpm $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
