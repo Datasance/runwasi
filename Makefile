@@ -330,7 +330,7 @@ clean:
 
 .PHONY: deb
 deb-%:
-	cargo deb $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
+	cargo deb --target=$(TARGET) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
 
 .PHONY: rpm
 rpm-%:
