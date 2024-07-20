@@ -82,7 +82,7 @@ jobs:
         shell: bash
         run: |
           cargo install cargo-deb
-          cargo install generate-rpm
+          cargo install cargo-generate-rpm
           make deb-${{ inputs.runtime }}
           make generate-rpm-${{ inputs.runtime }}
       - name: Upload artifacts
