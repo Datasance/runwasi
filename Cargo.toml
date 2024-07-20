@@ -18,11 +18,11 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/containerd/runwasi"
 homepage = "https://github.com/containerd/runwasi"
+authors = "https://github.com/containerd/runwasi"
 
 
 [workspace.package.metadata.deb]
-maintainer = "https://github.com/containerd/runwasi"
-assets = "https://github.com/containerd/runwasi"
+authors = "https://github.com/containerd/runwasi"
 
 
 [workspace.dependencies]
