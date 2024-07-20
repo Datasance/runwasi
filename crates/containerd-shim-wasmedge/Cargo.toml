@@ -2,7 +2,7 @@
 name = "containerd-shim-wasmedge"
 version = "0.5.0"
 edition.workspace = true
-copyright = ["Copyright 2022 Docker, Inc."]
+authors = ["Copyright 2022 Docker, Inc."]
 
 [dependencies]
 anyhow = { workspace = true }
