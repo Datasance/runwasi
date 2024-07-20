@@ -327,3 +327,10 @@ clean:
 	-$(MAKE) test-image/clean
 	-$(MAKE) test/k8s/clean
 	-$(MAKE) test/k3s/clean
+
+.PHONY: deb
+deb-%:
+	$(CARGO) deb $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)
+
+rpm-%:
+	$(CARGO) generate-rpm $(TARGET_FLAG) -p containerd-shim-$* $(FEATURES_$*) $(RELEASE_FLAG)

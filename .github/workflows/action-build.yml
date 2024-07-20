@@ -77,9 +77,29 @@ jobs:
           else
             tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -T /dev/null
           fi
+      - name: Package deb and rpm artifacts
+        if: ${{ inputs.runtime != 'common' }}
+        shell: bash
+        run: |
+          cargo install cargo-deb
+          cargo install generate-rpm
+          make deb-${{ inputs.runtime }}
+          make generate-rpm-${{ inputs.runtime }}
       - name: Upload artifacts
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
         with:
           name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
           path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz
+      - name: Upload deb artifacts
+        if: ${{ inputs.runtime != 'common' }}
+        uses: actions/upload-artifact@master
+        with:
+          name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
+          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.deb
+      - name: Upload rpm artifacts
+        if: ${{ inputs.runtime != 'common' }}
+        uses: actions/upload-artifact@master
+        with:
+          name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
+          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.rpm

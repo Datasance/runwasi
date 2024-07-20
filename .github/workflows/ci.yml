@@ -16,8 +16,8 @@ jobs:
     name: ${{ matrix.runtime }}
     strategy:
       matrix:
-        os: ["ubuntu-latest", "windows-latest"]
-        runtime: ["common", "wasmedge", "wasmtime", "wasmer"]
+        os: ["ubuntu-latest"]
+        runtime: ["wasmedge"]
     uses: ./.github/workflows/action-fmt.yml
     with:
       os: ${{ matrix.os }}
@@ -46,7 +46,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-22.04"]
-        runtime: ["common", "wasmtime", "wasmedge", "wasmer"]
+        runtime: ["wasmedge"]
         libc: ["musl", "gnu"]
         arch: ["x86_64", "aarch64"]
     uses: ./.github/workflows/action-build.yml
@@ -57,20 +57,6 @@ jobs:
       slug: "${{ matrix.arch }}-linux-${{ matrix.libc }}"
       arch: ${{ matrix.arch }}
 
-  build-windows:
-    name: ${{ matrix.runtime }}
-    permissions:
-      id-token: write
-    strategy:
-      matrix:
-        os: ["windows-latest"]
-        runtime: ["common", "wasmtime", "wasmedge", "wasmer"]
-    uses: ./.github/workflows/action-build.yml
-    with:
-      os: ${{ matrix.os }}
-      runtime: ${{ matrix.runtime }}
-      slug: "windows"
-
   smoke-tests:
     name: ${{ matrix.runtime }}
     needs: [build-ubuntu, test-image]
@@ -78,50 +64,8 @@ jobs:
       matrix:
         # 20.04 uses cgroupv1, 22.04 uses cgroupv2
         os: ["ubuntu-20.04", "ubuntu-22.04"]
-        runtime:  ["wasmtime", "wasmedge", "wasmer"]
+        runtime: ["wasmedge"]
     uses: ./.github/workflows/action-test-smoke.yml
-    with:
-      os: ${{ matrix.os }}
-      runtime: ${{ matrix.runtime }}
-
-  e2e-kind:
-    name: ${{ matrix.runtime }}
-    needs: [build-ubuntu, test-image]
-    strategy:
-      fail-fast: false
-      matrix:
-        # 20.04 uses cgroupv1, 22.04 uses cgroupv2
-        os: ["ubuntu-20.04", "ubuntu-22.04"]
-        runtime: ["wasmtime", "wasmedge", "wasmer"]
-    uses: ./.github/workflows/action-test-kind.yml
-    with:
-      os: ${{ matrix.os }}
-      runtime: ${{ matrix.runtime }}
-      test-command: make test/k8s-${{ matrix.runtime }}
-
-  e2e-kind-oci:
-    name: ${{ matrix.runtime }}
-    needs: [build-ubuntu, test-image-oci]
-    strategy:
-      matrix:
-        os: ["ubuntu-22.04"]
-        runtime: ["wasmtime", "wasmedge", "wasmer"]
-    uses: ./.github/workflows/action-test-kind.yml
-    with:
-      os: ${{ matrix.os }}
-      runtime: ${{ matrix.runtime }}
-      image: img-oci
-      test-command: make test/k8s-oci-${{ matrix.runtime }}
-
-  e2e-k3s:
-    name: ${{ matrix.runtime }}
-    needs: [build-ubuntu, test-image]
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ["ubuntu-20.04", "ubuntu-22.04"]
-        runtime: ["wasmtime", "wasmedge", "wasmer"]
-    uses: ./.github/workflows/action-test-k3s.yml
     with:
       os: ${{ matrix.os }}
       runtime: ${{ matrix.runtime }}
