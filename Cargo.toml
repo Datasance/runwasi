@@ -20,7 +20,7 @@ repository = "https://github.com/containerd/runwasi"
 homepage = "https://github.com/containerd/runwasi"
 
 
-[package.metadata.deb]
+[workspace.package.metadata.deb]
 maintainer = "https://github.com/containerd/runwasi"
 assets = "https://github.com/containerd/runwasi"
 
