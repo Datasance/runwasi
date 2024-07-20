@@ -18,11 +18,11 @@ license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/containerd/runwasi"
 homepage = "https://github.com/containerd/runwasi"
-authors = "https://github.com/containerd/runwasi"
+copyright = "Copyright 2022 Docker, Inc."
 
 
 [workspace.package.metadata.deb]
-authors = "https://github.com/containerd/runwasi"
+copyright = "Copyright 2022 Docker, Inc."
 
 
 [workspace.dependencies]
