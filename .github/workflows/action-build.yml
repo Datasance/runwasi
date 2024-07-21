@@ -97,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
-          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.deb
+          path: dist/debian/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.deb
      # - name: Upload rpm artifacts
      #   if: ${{ inputs.runtime != 'common' }}
      #   uses: actions/upload-artifact@master
