@@ -85,7 +85,7 @@ jobs:
           cargo install cargo-generate-rpm
           sudo apt-get install -y pkg-config protobuf-compiler libseccomp-dev libzstd-dev
           make deb-${{ inputs.runtime }}
-          make generate-rpm-${{ inputs.runtime }}
+          make rpm-${{ inputs.runtime }}
       - name: Upload artifacts
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
