@@ -86,12 +86,12 @@ jobs:
           sudo apt-get install -y pkg-config protobuf-compiler libseccomp-dev libzstd-dev
           make deb-${{ inputs.runtime }}
          # make rpm-${{ inputs.runtime }}
-      - name: Upload artifacts
-        if: ${{ inputs.runtime != 'common' }}
-        uses: actions/upload-artifact@master
-        with:
-          name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
-          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz
+     # - name: Upload artifacts
+     #   if: ${{ inputs.runtime != 'common' }}
+     #   uses: actions/upload-artifact@master
+     #   with:
+     #     name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
+     #     path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz
       - name: Upload deb artifacts
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
