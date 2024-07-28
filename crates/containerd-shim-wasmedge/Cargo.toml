@@ -2,7 +2,12 @@
 name = "containerd-shim-wasmedge"
 version = "0.5.0"
 edition.workspace = true
-authors = ["Copyright 2022 Docker, Inc."]
+authors = ["https://github.com/containerd/runwasi"]
+
+[package.metadata.deb]
+assets = [
+    ["target/build/x86_64-unknown-linux-gnu/*", "usr/local/bin", "755"],
+]
 
 [dependencies]
 anyhow = { workspace = true }
