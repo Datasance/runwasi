@@ -66,31 +66,27 @@ jobs:
         with:
           runtime: ${{ inputs.runtime }}
           os: ${{ inputs.os }}
-      - name: get package version
+      - name: Set image tag
         shell: bash
-        id: pkg_version
+        id: tags
         run: |
           if [[ ${{ github.ref_name }} =~ ^v.* ]] ; then
-            echo "version=${{ steps.version.outputs.version }}" >> "${GITHUB_OUTPUT}"
+            echo "VERSION=${{ github.ref_name }}" >> "${GITHUB_OUTPUT}"
           else
-            echo "version=${{ steps.version.outputs.version }}-${{ github.run_number }}" >> "${GITHUB_OUTPUT}"
+              echo "VERSION=${{ steps.previoustag.outputs.tag }}-dev" >> "${GITHUB_OUTPUT}"
           fi
-      - run: echo ${{ steps.version.outputs.version }}
-      # - name: Package artifacts
-      #   if: ${{ inputs.runtime != 'common' }}
-      #   shell: bash
-      #   run: |
-      #     make dist-${{ inputs.runtime }}
-      #     # Check if there's any files to archive as tar fails otherwise
-      #     if stat dist/bin/* >/dev/null 2>&1; then
-      #       tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -C dist/bin .
-      #     else
-      #       tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -T /dev/null
-      #     fi
+      - name: Get image tag
+        run: |
+          echo ${{ steps.tags.outputs.VERSION }}
       - name: Package artifacts
         if: ${{ inputs.runtime != 'common' }}
         shell: bash
         run: |
+          # Check if the slug is "windows", and skip packaging if true
+          if [[ "${{ inputs.slug }}" == "windows" ]]; then
+            echo "Skipping packaging for Windows"
+            exit 0
+          fi
           # Build the binary using the Makefile (same as your original code)
           make dist-${{ inputs.runtime }}
       
@@ -99,13 +95,14 @@ jobs:
           
             # Install fpm (Effing Package Management) to create .deb and .rpm packages
             gem install --no-document fpm
+            fpm -h
       
             # Create a .deb package with docker-ce dependency
-            fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -${{ steps.version.outputs.version }} --architecture ${{ inputs.slug }} \
+            fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
               --deb-depends "docker-ce" -C dist/bin .
       
             # Create an .rpm package with docker-ce dependency
-            fpm -s dir -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.version }} --architecture ${{ inputs.slug }} \
+            fpm -s dir -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
               --rpm-depends "docker-ce" -C dist/bin .
             
             #  Move the generated packages to a specific directory
