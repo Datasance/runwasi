@@ -116,22 +116,6 @@ jobs:
           else
             echo "No binaries found to package"
           fi
-          - name: Create deb package
-          shell: bash
-          id: create_deb_package
-          run: |
-            cd packaging/iofog-agent
-            fpm -s dir -d 'openjdk-8-jdk | openjdk-11-jdk | openjdk-17-jdk' -d docker-ce  -t deb -n iofog-agent -v ${{ steps.pkg_version.outputs.version }} -a all --deb-no-default-config-files --after-install debian.sh --after-remove remove.sh --before-upgrade upgrade.sh --after-upgrade debian.sh etc usr
-            echo "pkg created"
-            ls
-        - name: Create rpm package
-          shell: bash
-          id: create_rpm_package
-          run: |
-            cd packaging/iofog-agent
-            fpm -s dir --depends java-17-openjdk -d docker-ce -t rpm -n iofog-agent -v ${{ steps.pkg_version.outputs.version }} -a all --rpm-os 'linux' --after-install rpm.sh --after-remove remove.sh --before-upgrade upgrade.sh --after-upgrade rpm.sh etc usr;
-            echo "pkg created"
-            ls
       - name: Upload artifacts
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
