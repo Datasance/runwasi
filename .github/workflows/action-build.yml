@@ -102,11 +102,11 @@ jobs:
           
             # Create a .deb package with docker-ce dependency
             fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
-              --deb-depends "docker-ce" -C dist/bin .
+              --deb-depends "docker-ce" -C dist/bin/containerd-shim-${{ inputs.runtime }}-${{ steps.version.outputs.VERSION }} .
       
             # Create an .rpm package with docker-ce dependency
             fpm -s dir -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
-              --rpm-depends "docker-ce" -C dist/bin .
+              --rpm-depends "docker-ce" -C dist/bin/containerd-shim-${{ inputs.runtime }}-${{ steps.version.outputs.VERSION }} .
             
             #  Move the generated packages to a specific directory
             mkdir -p dist/packages
