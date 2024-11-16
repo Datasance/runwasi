@@ -89,33 +89,35 @@ jobs:
         if: ${{ inputs.runtime != 'common' }}
         shell: bash
         run: |
-          # Check if the slug is "windows", and skip packaging if true
           if [[ "${{ inputs.slug }}" == "windows" ]]; then
-            echo "Skipping packaging for Windows"
-            exit 0
+              echo "Skipping packaging for Windows"
+              exit 0
           fi
-          # Build the binary using the Makefile (same as your original code)
-          make dist-${{ inputs.runtime }}
-      
-          # Check if there are any files to package
-          if stat dist/bin/* >/dev/null 2>&1; then
-            ls
-            # Create a .deb package with docker-ce dependency
-            cd /home/runner/work/runwasi/runwasi/dist/bin/
-            ls
-          # Create a .deb package with docker-ce dependency
-            fpm -s dir -d docker-ce -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} -C /home/runner/work/runwasi/runwasi/dist/bin/
-            ls
-      
-          # Create an .rpm package with docker-ce dependency
-            fpm -s dir --depends docker-ce -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} --rpm-os 'linux' -C /home/runner/work/runwasi/runwasi/dist/bin/
-            ls
-            
-            #  Move the generated packages to a specific directory
-            mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
-            mv *.deb *.rpm /home/runner/work/runwasi/runwasi/dist/packages
+
+          # Ensure the binary exists
+          if [[ -f /home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-wasmedge-v1 ]]; then
+              cd /home/runner/work/runwasi/runwasi/dist/bin/
+
+              # Create a .deb package
+              fpm -s dir -d docker-ce -t deb \
+                  -n containerd-shim-${{ inputs.runtime }}-v1 \
+                  -v ${{ steps.version.outputs.VERSION }} \
+                  --architecture ${{ inputs.slug }} \
+                  ./containerd-shim-wasmedge-v1=/usr/local/containerd-shim-wasmedge-v1
+
+              # Create an .rpm package
+              fpm -s dir -d docker-ce -t rpm \
+                  -n containerd-shim-${{ inputs.runtime }}-v1 \
+                  -v ${{ steps.version.outputs.VERSION }} \
+                  --architecture ${{ inputs.slug }} \
+                  ./containerd-shim-wasmedge-v1=/usr/local/containerd-shim-wasmedge-v1
+
+              # Move generated packages
+              mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
+              mv *.deb *.rpm /home/runner/work/runwasi/runwasi/dist/packages
           else
-            echo "No binaries found to package"
+              echo "No binaries found to package"
+              exit 1
           fi
       - name: Upload artifacts
         if: ${{ inputs.runtime != 'common' }}
