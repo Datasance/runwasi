@@ -101,12 +101,11 @@ jobs:
           if stat dist/bin/* >/dev/null 2>&1; then
           
             # Create a .deb package with docker-ce dependency
-            fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
-              --deb-depends "docker-ce" -C dist/bin/containerd-shim-${{ inputs.runtime }}-${{ steps.version.outputs.VERSION }} .
+            dist/bin/
+            fpm -s dir -d docker-ce -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} 
       
             # Create an .rpm package with docker-ce dependency
-            fpm -s dir -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
-              --rpm-depends "docker-ce" -C dist/bin/containerd-shim-${{ inputs.runtime }}-${{ steps.version.outputs.VERSION }} .
+            fpm -s dir --depends docker-ce -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }}
             
             #  Move the generated packages to a specific directory
             mkdir -p dist/packages
