@@ -102,10 +102,13 @@ jobs:
           
             # Create a .deb package with docker-ce dependency
             cd /home/runner/work/runwasi/runwasi/dist/bin/
-            fpm -s dir -d docker-ce -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} 
+            ls
+            fpm -s dir -d docker-ce -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }}
+            ls
       
             # Create an .rpm package with docker-ce dependency
             fpm -s dir --depends docker-ce -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }}
+            ls
             
             #  Move the generated packages to a specific directory
             mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
