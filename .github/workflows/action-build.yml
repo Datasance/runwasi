@@ -89,6 +89,7 @@ jobs:
         if: ${{ inputs.runtime != 'common' }}
         shell: bash
         run: |
+          make dist-${{ inputs.runtime }}
           if [[ "${{ inputs.slug }}" == "windows" ]]; then
               echo "Skipping packaging for Windows"
               exit 0
