@@ -112,15 +112,17 @@ jobs:
               ls -la /home/runner/work/runwasi/runwasi/dist/bin/
 
               # Create a .deb package
-              fpm -s dir -d docker-ce -t deb \
-                  -n containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }} \
+              fpm -s gem -d docker-ce -t deb \
+                  -n containerd-shim-${{ inputs.runtime }}-v1 \
                   -v ${{ steps.version.outputs.VERSION }} \
+                  -a $arch \
                   $binary_path=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
 
               # Create an .rpm package
-              fpm -s dir -d docker-ce -t rpm \
-                  -n containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }} \
+              fpm -s gem -d docker-ce -t rpm \
+                  -n containerd-shim-${{ inputs.runtime }}-v1 \
                   -v ${{ steps.version.outputs.VERSION }} \
+                  -a $arch \
                   $binary_path=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
 
               # Move generated packages
