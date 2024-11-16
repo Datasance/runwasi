@@ -66,20 +66,57 @@ jobs:
         with:
           runtime: ${{ inputs.runtime }}
           os: ${{ inputs.os }}
+      - name: get package version
+        shell: bash
+        id: pkg_version
+        run: |
+          if [[ ${{ github.ref_name }} =~ ^v.* ]] ; then
+            echo "version=${{ steps.version.outputs.version }}" >> "${GITHUB_OUTPUT}"
+          else
+            echo "version=${{ steps.version.outputs.version }}-${{ github.run_number }}" >> "${GITHUB_OUTPUT}"
+          fi
+      - run: echo ${{ steps.version.outputs.version }}
+      # - name: Package artifacts
+      #   if: ${{ inputs.runtime != 'common' }}
+      #   shell: bash
+      #   run: |
+      #     make dist-${{ inputs.runtime }}
+      #     # Check if there's any files to archive as tar fails otherwise
+      #     if stat dist/bin/* >/dev/null 2>&1; then
+      #       tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -C dist/bin .
+      #     else
+      #       tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -T /dev/null
+      #     fi
       - name: Package artifacts
         if: ${{ inputs.runtime != 'common' }}
         shell: bash
         run: |
+          # Build the binary using the Makefile (same as your original code)
           make dist-${{ inputs.runtime }}
-          # Check if there's any files to archive as tar fails otherwise
+      
+          # Check if there are any files to package
           if stat dist/bin/* >/dev/null 2>&1; then
-            tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -C dist/bin .
+          
+            # Install fpm (Effing Package Management) to create .deb and .rpm packages
+            gem install --no-document fpm
+      
+            # Create a .deb package with docker-ce dependency
+            fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -${{ steps.version.outputs.version }} --architecture ${{ inputs.slug }} \
+              --deb-depends "docker-ce" -C dist/bin .
+      
+            # Create an .rpm package with docker-ce dependency
+            fpm -s dir -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.version }} --architecture ${{ inputs.slug }} \
+              --rpm-depends "docker-ce" -C dist/bin .
+            
+            #  Move the generated packages to a specific directory
+            mkdir -p dist/packages
+            mv *.deb *.rpm dist/packages
           else
-            tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -T /dev/null
+            echo "No binaries found to package"
           fi
       - name: Upload artifacts
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
         with:
-          name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
-          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz
+          name: containerd-shim-${{ inputs.runtime }}-v1
+          path: ${{ github.workspace }}/dist/packages
