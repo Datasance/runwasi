@@ -94,7 +94,14 @@ jobs:
               echo "Skipping packaging for Windows"
               exit 0
           fi
-
+          if [[ "${{ inputs.slug }}" == "x86_64-linux-gnu" || "${{ inputs.slug }}" == "x86_64-linux-musl" ]]; then
+              arch="amd64"
+          elif [[ "${{ inputs.slug }}" == "aarch64-linux-gnu" || "${{ inputs.slug }}" == "aarch64-linux-musl" ]]; then
+              arch="arm64"
+          else
+              echo "Unsupported architecture slug: ${{ inputs.slug }}"
+              exit 1
+          fi
           # Ensure the binary exists
           if [[ -f /home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-wasmedge-v1 ]]; then
               cd /home/runner/work/runwasi/runwasi/dist/bin/
@@ -103,14 +110,14 @@ jobs:
               fpm -s dir -d docker-ce -t deb \
                   -n containerd-shim-${{ inputs.runtime }}-v1 \
                   -v ${{ steps.version.outputs.VERSION }} \
-                  --architecture ${{ inputs.slug }} \
+                  --architecture $arch \
                   ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
 
               # Create an .rpm package
               fpm -s dir -d docker-ce -t rpm \
                   -n containerd-shim-${{ inputs.runtime }}-v1 \
                   -v ${{ steps.version.outputs.VERSION }} \
-                  --architecture ${{ inputs.slug }} \
+                  --architecture $arch \
                   ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
 
               # Move generated packages
