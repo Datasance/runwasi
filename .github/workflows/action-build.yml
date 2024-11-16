@@ -78,6 +78,13 @@ jobs:
       - name: Get image tag
         run: |
           echo ${{ steps.tags.outputs.VERSION }}
+      - name: Set up Ruby 3.1.4
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.4
+      - run: |
+          gem install --no-document fpm
+          fpm -h
       - name: Package artifacts
         if: ${{ inputs.runtime != 'common' }}
         shell: bash
@@ -93,10 +100,6 @@ jobs:
           # Check if there are any files to package
           if stat dist/bin/* >/dev/null 2>&1; then
           
-            # Install fpm (Effing Package Management) to create .deb and .rpm packages
-            gem install --no-document fpm
-            fpm -h
-      
             # Create a .deb package with docker-ce dependency
             fpm -s dir -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -${{ steps.version.outputs.VERSION }} --architecture ${{ inputs.slug }} \
               --deb-depends "docker-ce" -C dist/bin .
