@@ -66,6 +66,11 @@ jobs:
         with:
           runtime: ${{ inputs.runtime }}
           os: ${{ inputs.os }}
+      - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 0.0.0
       - name: Set image tag
         shell: bash
         id: tags
@@ -95,6 +100,12 @@ jobs:
               exit 0
           fi
 
+          if stat dist/bin/* >/dev/null 2>&1; then
+            tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -C dist/bin .
+          else
+            tar -czf dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz -T /dev/null
+          fi
+          
           # Ensure the binary exists
           binary_path="/home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-${{ inputs.runtime }}-v1"
           if [[ -f $binary_path ]]; then
