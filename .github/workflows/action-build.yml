@@ -91,7 +91,7 @@ jobs:
             version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
             echo "VERSION=$version" >> "${GITHUB_OUTPUT}"
           else
-            version=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/^v//')-dev
+            version=$(echo "${{ steps.previoustag.outputs.tag }}-${{ github.run_number }}" | sed 's/^v//')-dev
             echo "VERSION=$version" >> "${GITHUB_OUTPUT}"
           fi
       - name: Get image tag
@@ -151,7 +151,7 @@ jobs:
         uses: actions/upload-artifact@master
         with:
           name: containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}
-          path: ${{ github.workspace }}/dist/packages
+          path: dist/containerd-shim-${{ inputs.runtime }}-${{ inputs.slug }}.tar.gz
       - name: Release
         uses: softprops/action-gh-release@v1
         if: ${{ inputs.runtime != 'common' && inputs.slug != 'windows' && startsWith(github.ref, 'refs/tags/')}}
