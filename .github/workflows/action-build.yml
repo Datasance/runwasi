@@ -125,6 +125,9 @@ jobs:
               echo "Unsupported architecture slug: ${{ inputs.slug }}"
               exit 1
           fi
+
+          echo "arch=$arch" >> "${GITHUB_OUTPUT}"
+
           # Ensure the binary exists
           binary_path="/home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-${{ inputs.runtime }}-v1"
           if [[ -f $binary_path ]]; then
@@ -157,5 +160,5 @@ jobs:
         if: ${{ inputs.runtime != 'common' && inputs.slug != 'windows' && startsWith(github.ref, 'refs/tags/')}}
         with:
           files: |
-            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}_${{ steps.tags.outputs.VERSION }}_$arch.deb
-            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}-${{ steps.tags.outputs.VERSION }}-1.$arch.rpm
+            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}_${{ steps.tags.outputs.VERSION }}_${{ steps.package.outputs.arch }}.deb
+            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}-${{ steps.tags.outputs.VERSION }}-1.${{ steps.package.outputs.arch }}.rpm
