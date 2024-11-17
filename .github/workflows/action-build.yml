@@ -118,5 +118,5 @@ jobs:
         if: ${{ inputs.runtime != 'common' }}
         uses: actions/upload-artifact@master
         with:
-          name: containerd-shim-${{ inputs.runtime }}-v1
+          name: containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}
           path: ${{ github.workspace }}/dist/packages
