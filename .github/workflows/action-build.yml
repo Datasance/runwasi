@@ -129,6 +129,7 @@ jobs:
 
           echo "arch=$arch" >> "${GITHUB_OUTPUT}"
 
+
           # Ensure the binary exists
           binary_path="/home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-${{ inputs.runtime }}-v1"
           if [[ -f $binary_path ]]; then
@@ -137,9 +138,19 @@ jobs:
 
               # Create a .deb package
               fpm -s dir -t deb --name containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }} --version ${{ steps.tags.outputs.VERSION }} --architecture $arch --depends 'docker-ce > 26.0.0' ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
-      
+
+              # Map architecture for RPM explicitly
+              rpm_arch=$arch
+              if [[ "$arch" == "arm64" ]]; then
+                  rpm_arch="aarch64" #
+              elif [[ "$arch" == "amd64" ]]; then
+                  rpm_arch="x86_64"
+              fi
+
+              echo "rpm_arch=$rpm_arch" >> "${GITHUB_OUTPUT}"
+
               # Create an .rpm package
-              fpm -s dir -t rpm --name containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }} --version ${{ steps.tags.outputs.VERSION }} --architecture $arch --rpm-os 'linux' --depends 'docker-ce > 26.0.0' ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
+              fpm -s dir -t rpm --name containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }} --version ${{ steps.tags.outputs.VERSION }} --architecture $rpm_arch --rpm-os 'linux' --depends 'docker-ce > 26.0.0' ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
 
               # Move generated packages
               mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
@@ -162,4 +173,4 @@ jobs:
         with:
           files: |
             /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}_${{ steps.tags.outputs.VERSION }}_${{ steps.package.outputs.arch }}.deb
-            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}-${{ steps.tags.outputs.VERSION }}-1.${{ steps.package.outputs.arch }}.rpm
+            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ inputs.slug }}-${{ steps.tags.outputs.VERSION }}-1.${{ steps.package.outputs.rpm_arch }}.rpm
