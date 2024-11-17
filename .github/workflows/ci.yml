@@ -52,7 +52,19 @@ jobs:
   build-ubuntu:
     name: ${{ matrix.runtime }}
     permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
       id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     strategy:
       matrix:
         os: ["ubuntu-22.04"]
@@ -70,7 +82,19 @@ jobs:
   build-windows:
     name: ${{ matrix.runtime }}
     permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
       id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     strategy:
       matrix:
         os: ["windows-latest"]

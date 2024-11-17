@@ -30,18 +30,6 @@ jobs:
   build-sign-upload:
     permissions:
       id-token: write
-      actions: write
-      checks: write
-      contents: write
-      deployments: write
-      issues: write
-      discussions: write
-      packages: write
-      pages: write
-      pull-requests: write
-      repository-projects: write
-      security-events: write
-      statuses: write
     name: build for ${{ inputs.slug }}
     runs-on: ${{ inputs.os }}
     steps:
