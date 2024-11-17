@@ -140,6 +140,7 @@ jobs:
               deb_slug=${{ inputs.slug }}
               if [[ "$deb_slug" == "x86_64-linux-gnu" ]]; then
                   deb_slug="x86-64-linux-gnu"
+              fi
 
               echo "deb_slug=$deb_slug" >> "${GITHUB_OUTPUT}"
 
