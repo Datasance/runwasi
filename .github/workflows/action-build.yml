@@ -105,7 +105,7 @@ jobs:
               fpm -s dir -t deb --name containerd-shim-${{ inputs.runtime }}-v1 --version 0.7.0 --architecture ${{ inputs.slug }} --depends docker-ce  ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
       
               # Create an .rpm package
-              fpm -s dir -t rpm --name containerd-shim-${{ inputs.runtime }}-v1 -version 0.7.0 --architecture ${{ inputs.slug }} --rpm-os 'linux' --depends docker-ce ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
+              fpm -s dir -t rpm --name containerd-shim-${{ inputs.runtime }}-v1 --version 0.7.0 --architecture ${{ inputs.slug }} --rpm-os 'linux' --depends docker-ce ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
 
               # Move generated packages
               mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
