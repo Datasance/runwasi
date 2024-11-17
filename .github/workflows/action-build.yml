@@ -76,9 +76,11 @@ jobs:
         id: tags
         run: |
           if [[ ${{ github.ref_name }} =~ ^v.* ]] ; then
-            echo "VERSION=${{ github.ref_name }}" >> "${GITHUB_OUTPUT}"
+            version=$(echo "${{ github.ref_name }}" | sed 's/^v//')
+            echo "VERSION=$version" >> "${GITHUB_OUTPUT}"
           else
-              echo "VERSION=${{ steps.previoustag.outputs.tag }}-dev" >> "${GITHUB_OUTPUT}"
+            version=$(echo "${{ steps.previoustag.outputs.tag }}" | sed 's/^v//')-dev
+            echo "VERSION=$version" >> "${GITHUB_OUTPUT}"
           fi
       - name: Get image tag
         run: |
