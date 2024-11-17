@@ -105,6 +105,7 @@ jobs:
           gem install --no-document fpm
           fpm -h
       - name: Package artifacts
+        id: package
         if: ${{ inputs.runtime != 'common' && inputs.slug != 'windows' }}
         shell: bash
         run: |
