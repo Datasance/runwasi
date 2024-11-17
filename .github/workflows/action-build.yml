@@ -133,8 +133,8 @@ jobs:
           path: ${{ github.workspace }}/dist/packages
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: ${{ inputs.runtime != 'common' && inputs.slug != 'windows' && startsWith(github.ref, 'refs/tags/') }}
+        if: ${{ inputs.runtime != 'common' && inputs.slug != 'windows'}}
         with:
           files: |
             /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ steps.tags.outputs.VERSION }}_${{ inputs.slug }}.deb
-            /home/runner/work/runwasi/runwasi/dist/packages/containerd-shim-${{ inputs.runtime }}-v1-${{ steps.tags.outputs.VERSION }}-1.${{ inputs.slug }}.rpm
+            /home/runner/work/runwasi/runwasi/dist/packages//containerd-shim-${{ inputs.runtime }}-v1-${{ steps.tags.outputs.VERSION }}-1.${{ inputs.slug }}.rpm
