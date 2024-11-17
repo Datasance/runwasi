@@ -95,16 +95,6 @@ jobs:
               exit 0
           fi
 
-          # Map inputs.slug to proper architecture for fpm
-          if [[ "${{ inputs.slug }}" == "x86_64-linux-gnu" || "${{ inputs.slug }}" == "x86_64-linux-musl" ]]; then
-              arch="x86_64"
-          elif [[ "${{ inputs.slug }}" == "aarch64-linux-gnu" || "${{ inputs.slug }}" == "aarch64-linux-musl" ]]; then
-              arch="arm64"
-          else
-              echo "Unsupported architecture slug: ${{ inputs.slug }}"
-              exit 1
-          fi
-
           # Ensure the binary exists
           binary_path="/home/runner/work/runwasi/runwasi/dist/bin/containerd-shim-${{ inputs.runtime }}-v1"
           if [[ -f $binary_path ]]; then
@@ -112,16 +102,10 @@ jobs:
               ls -la /home/runner/work/runwasi/runwasi/dist/bin/
 
               # Create a .deb package
-              fpm -s dir -d docker-ce -t deb \
-              -n containerd-shim-${{ inputs.runtime }}-v1 \
-              -v ${{ steps.version.outputs.VERSION }} -a all \
-             ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
+              fpm -s dir -d docker-ce -t deb -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} -a ${{ inputs.slug }}  ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
       
               # Create an .rpm package
-              fpm -s dir -d docker-ce -t rpm \
-                  -n containerd-shim-${{ inputs.runtime }}-v1 \
-                  -v ${{ steps.version.outputs.VERSION }} -a all \
-                  ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/containerd-shim-${{ inputs.runtime }}-v1
+              fpm -s dir -d docker-ce -t rpm -n containerd-shim-${{ inputs.runtime }}-v1 -v ${{ steps.version.outputs.VERSION }} -a ${{ inputs.slug }} --rpm-os 'linux' ./containerd-shim-${{ inputs.runtime }}-v1=/usr/local/bin/containerd-shim-${{ inputs.runtime }}-v1
 
               # Move generated packages
               mkdir -p /home/runner/work/runwasi/runwasi/dist/packages
