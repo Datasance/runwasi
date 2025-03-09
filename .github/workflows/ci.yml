@@ -4,9 +4,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - release/0.10.0
+    tags: [v*]
   pull_request:
-    branches: [main]
+    branches:
+      - release/0.10.0
     paths-ignore:
       - '*.md'
       - 'docs/**'
@@ -56,12 +59,25 @@ jobs:
   build-ubuntu:
     name: ${{ matrix.runtime }}
     permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
       id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     strategy:
       matrix:
         os: ["ubuntu-22.04"]
         runtime: ["common", "wasmtime", "wasmedge", "wasmer", "wamr"]
-        libc: ["musl", "gnu"]
+        # libc: ["musl", "gnu"]
+        libc: ["gnu"]
         arch: ["x86_64", "aarch64"]
     uses: ./.github/workflows/action-build.yml
     with:
@@ -74,7 +90,19 @@ jobs:
   build-windows:
     name: ${{ matrix.runtime }}
     permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
       id-token: write
+      issues: write
+      discussions: write
+      packages: write
+      pages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     strategy:
       matrix:
         os: ["windows-latest"]
