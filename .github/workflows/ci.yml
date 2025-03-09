@@ -76,8 +76,7 @@ jobs:
       matrix:
         os: ["ubuntu-22.04"]
         runtime: ["common", "wasmtime", "wasmedge", "wasmer", "wamr"]
-        # libc: ["musl", "gnu"]
-        libc: ["gnu"]
+        libc: ["musl", "gnu"]
         arch: ["x86_64", "aarch64"]
     uses: ./.github/workflows/action-build.yml
     with:
