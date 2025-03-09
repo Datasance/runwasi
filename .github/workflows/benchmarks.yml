@@ -41,7 +41,7 @@ jobs:
           name: Criterion.rs Benchmark
           tool: 'cargo'
           output-file-path: output.txt
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           # my experimental local benchmarking seems to have a 20% margin of error. 
           # So I set the alert threshold to 130% of the previous benchmark result.
           # If the current benchmark result is more than 130% of the previous benchmark result, it will fail.
@@ -78,7 +78,7 @@ jobs:
           name: Criterion.rs Benchmark
           tool: 'customSmallerIsBetter'
           output-file-path: bench-mem.json
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           # my experimental local benchmarking seems to have a 20% margin of error. 
           # So I set the alert threshold to 130% of the previous benchmark result.
           # If the current benchmark result is more than 130% of the previous benchmark result, it will fail.
@@ -117,7 +117,7 @@ jobs:
         if: success()
         uses: ./.github/actions/run-hey-load-test
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
       - name: Stop wasmtime shim
         if: success()
         shell: bash
@@ -164,7 +164,7 @@ jobs:
           name: Stress Test Benchmark
           tool: 'customBiggerIsBetter'
           output-file-path: stress-bench.json
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           alert-threshold: '130%'
           fail-on-alert: ${{ github.event_name == 'schedule' }}
           alert-comment-cc-users: '@runwasi-committers'
