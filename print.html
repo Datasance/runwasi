@@ -1,0 +1,1234 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Runwasi Developer Documentation</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Documentation for runwasi">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Runwasi Developer Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/containerd/runwasi" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./art/logo/runwasi_icon3.svg">
+    <img alt="runwasi logo" src="./art/logo/runwasi_icon1.svg">
+  </picture>
+  <h1 id="runwasi"><a class="header" href="#runwasi">runwasi</a></h1>
+  <p>
+    <a href="https://github.com/containerd/runwasi/actions/workflows/ci.yml"><img src="https://github.com/containerd/runwasi/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+    <a href="https://crates.io/crates/containerd-shim-wasm"><img src="https://img.shields.io/crates/v/containerd-shim-wasm" alt="crates.io"></a>
+    <a href="https://docs.rs/containerd-shim-wasm"><img src="https://img.shields.io/docsrs/containerd-shim-wasm" alt="docs.rs"></a>
+    <a href="https://img.shields.io/crates/d/containerd-shim-wasm.svg"><img src="https://img.shields.io/crates/d/containerd-shim-wasm.svg" alt="Downloads"></a>
+    <a href="https://runwasi.dev/"><img src="https://img.shields.io/website?up_message=runwasi.dev&url=https%3A%2F%2Frunwasi.dev" alt="website"></a>
+  </p>
+</div>
+<p>This is a project to facilitate running wasm workloads managed by containerd either directly (ie. through ctr) or as directed by Kubelet via the CRI plugin.
+It is intended to be a (rust) library that you can take and integrate with your wasm host.
+Included in the repository is a PoC for running a plain wasi host (ie. no extra host functions except to support wasi system calls).</p>
+<h2 id="community"><a class="header" href="#community">Community</a></h2>
+<ul>
+<li>If you haven’t joined the CNCF slack yet, you can do so <a href="https://slack.cncf.io/">here</a>.</li>
+<li>Come join us on our <a href="https://cloud-native.slack.com/archives/C04LTPB6Z0V">slack channel #runwasi</a> on the CNCF slack.</li>
+<li>Public Community Call on Tuesdays every other week at 9:00 AM PT: <a href="https://zoom.us/my/containerd?pwd=bENmREpnSGRNRXdBZWV5UG8wbU1oUT09">Zoom</a>, <a href="https://docs.google.com/document/d/1aOJ-O7fgMyRowHD0kOoA2Z_4d19NyAvvdqOkZO3Su_M/edit?usp=sharing">Meeting Notes</a></li>
+</ul>
+<p>See our <a href="https://runwasi.dev/resources/community.html">Community Page</a> for more ways to get involved.</p>
+<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
+<p>For comprehensive documentation, visit our <a href="https://runwasi.dev/">Documentation Site</a>.</p>
+<p>For <code>containerd-shim-wasm</code> crate documentation, visit <a href="https://docs.rs/containerd-shim-wasm">containerd-shim-wasm</a>.</p>
+<h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
+<h3 id="installation"><a class="header" href="#installation">Installation</a></h3>
+<pre><code class="language-terminal">make build
+sudo make install
+</code></pre>
+<p>For detailed installation instructions, see the <a href="https://runwasi.dev/getting-started/installation.html">Installation Guide</a>.</p>
+<h3 id="running-an-example"><a class="header" href="#running-an-example">Running an Example</a></h3>
+<pre><code class="language-terminal"># Pull the image
+sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-app:latest
+
+# Run the example
+sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<p>For more examples and detailed usage, see the <a href="https://runwasi.dev/getting-started/demos.html">Demos</a>.</p>
+<h2 id="projects-using-runwasi"><a class="header" href="#projects-using-runwasi">Projects Using Runwasi</a></h2>
+<p>Check out these projects that build on top of runwasi:</p>
+<ul>
+<li><a href="https://github.com/spinkube/containerd-shim-spin">spinkube/containerd-shim-spin</a></li>
+<li><a href="https://github.com/deislabs/containerd-wasm-shims">deislabs/containerd-wasm-shims</a></li>
+</ul>
+<h2 id="contributing"><a class="header" href="#contributing">Contributing</a></h2>
+<p>To begin contributing, please read our <a href="https://runwasi.dev/CONTRIBUTING.html">Contributing Guide</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="installation-1"><a class="header" href="#installation-1">Installation</a></h1>
+<p>This guide will help you install and set up Runwasi on your system.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<p>Before installing Runwasi, ensure you have the following prerequisites installed:</p>
+<ul>
+<li><a href="https://www.rust-lang.org/tools/install">Rust</a> (stable)</li>
+<li><a href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">containerd</a></li>
+</ul>
+<p>Additionally, check the <a href="getting-started/../CONTRIBUTING.html#setting-up-your-local-environment">contributing guide</a> for detailed instructions on setting up your environment with all required dependencies.</p>
+<h2 id="installation-methods"><a class="header" href="#installation-methods">Installation Methods</a></h2>
+<h3 id="option-1-installing-prebuilt-binaries"><a class="header" href="#option-1-installing-prebuilt-binaries">Option 1: Installing Prebuilt Binaries</a></h3>
+<p>The easiest way to get started is to download prebuilt binaries from the <a href="https://github.com/containerd/runwasi/releases">GitHub releases page</a>.</p>
+<ol>
+<li>
+<p>Navigate to the <a href="https://github.com/containerd/runwasi/releases">releases page</a></p>
+</li>
+<li>
+<p>Download the appropriate shim for your preferred WebAssembly runtime:</p>
+<ul>
+<li><code>containerd-shim-wasmtime-v1</code> - for Wasmtime runtime</li>
+<li><code>containerd-shim-wasmedge-v1</code> - for WasmEdge runtime</li>
+<li><code>containerd-shim-wasmer-v1</code> - for Wasmer runtime</li>
+<li><code>containerd-shim-wamr-v1</code> - for WebAssembly Micro Runtime (WAMR)</li>
+</ul>
+</li>
+<li>
+<p>Make the binary executable and move it to your PATH:</p>
+</li>
+</ol>
+<pre><code class="language-bash">chmod +x containerd-shim-wasmtime-v1
+sudo install containerd-shim-wasmtime-v1 /usr/local/bin/
+</code></pre>
+<ol start="4">
+<li>Verify the binary signature (recommended):</li>
+</ol>
+<pre><code class="language-bash"># Verify using cosign
+cosign verify-blob \
+    --signature containerd-shim-wasmtime-v1.sig \
+    --certificate containerd-shim-wasmtime-v1.pem \
+    --certificate-identity https://github.com/containerd/runwasi/.github/workflows/action-build.yml@refs/heads/main \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+    containerd-shim-wasmtime-v1
+</code></pre>
+<h3 id="option-2-building-from-source"><a class="header" href="#option-2-building-from-source">Option 2: Building from Source</a></h3>
+<p>To build and install Runwasi from source:</p>
+<ol>
+<li>Clone the repository:</li>
+</ol>
+<pre><code class="language-bash">git clone https://github.com/containerd/runwasi.git
+cd runwasi
+</code></pre>
+<ol start="2">
+<li>Build the shim for your preferred runtime:</li>
+</ol>
+<pre><code class="language-bash">make build
+</code></pre>
+<blockquote>
+<p>Note: <code>make build</code> will only build shims for all runtimes. You can specify which runtime to build with <code>make build-wasmtime</code>, <code>make build-wasmer</code>, <code>make build-wasmedge</code>, <code>make build-wamr</code> etc.</p>
+</blockquote>
+<ol start="3">
+<li>Install the binary:</li>
+</ol>
+<pre><code class="language-bash">sudo make install
+</code></pre>
+<p>The <code>make install</code> command copies the binary to $PATH</p>
+<h2 id="testing-your-installation"><a class="header" href="#testing-your-installation">Testing Your Installation</a></h2>
+<p>After installation, you can test your setup by pulling and running a test image:</p>
+<ol>
+<li>Pull the test image:</li>
+</ol>
+<pre><code class="language-bash">sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-app:latest
+</code></pre>
+<ol start="2">
+<li>Run a test container:</li>
+</ol>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<p>You should see output from the demo application.</p>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<p>Now that you have runwasi shims installed, you can proceed to the <a href="getting-started/./demos.html">Demos</a> to learn how to run WebAssembly workloads with Runwasi.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="demos"><a class="header" href="#demos">Demos</a></h1>
+<p>This page provides various demonstrations of running WebAssembly workloads with Runwasi.</p>
+<h2 id="prerequisites-1"><a class="header" href="#prerequisites-1">Prerequisites</a></h2>
+<p>Before running these demos, make sure you have:</p>
+<ol>
+<li>Installed the Runwasi shims as described in the <a href="getting-started/./installation.html">Installation Guide</a></li>
+<li>Installed containerd and its CLI tool <code>ctr</code></li>
+</ol>
+<h2 id="demo-1-using-container-image-with-wasm-module"><a class="header" href="#demo-1-using-container-image-with-wasm-module">Demo 1: Using Container Image with Wasm Module</a></h2>
+<p>This demo runs a WebAssembly module from a regular OCI container image that contains the Wasm module in its filesystem.</p>
+<h3 id="setup"><a class="header" href="#setup">Setup</a></h3>
+<p>Pull the test image:</p>
+<pre><code class="language-bash">make pull-app
+# or
+sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-app:latest
+</code></pre>
+<h3 id="running-the-demo"><a class="header" href="#running-the-demo">Running the Demo</a></h3>
+<p>Run the image with your preferred runtime:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<p>You can also specify a particular command:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm /wasi-demo-app.wasm echo 'hello'
+</code></pre>
+<p>The output should look like:</p>
+<pre><code>This is a song that never ends.
+Yes, it goes on and on my friends.
+Some people started singing it not knowing what it was,
+So they'll continue singing it forever just because...
+</code></pre>
+<p>To kill the process, run in another terminal:</p>
+<pre><code class="language-bash">sudo ctr task kill -s SIGKILL testwasm
+</code></pre>
+<p>The test binary supports various commands for different types of functionality. Check <a href="https://github.com/containerd/runwasi/blob/main/crates/wasi-demo-app/src/main.rs">crates/wasi-demo-app/src/main.rs</a> to explore more options.</p>
+<h2 id="demo-2-using-oci-images-with-custom-wasm-layers"><a class="header" href="#demo-2-using-oci-images-with-custom-wasm-layers">Demo 2: Using OCI Images with Custom WASM Layers</a></h2>
+<p>This demo showcases a more advanced approach using OCI Images with custom WASM layers. This approach doesn’t include the Wasm module in the container’s filesystem but instead stores it as a separate layer in the OCI image. This provides better cross-platform support and de-duplication in the Containerd content store.</p>
+<blockquote>
+<p><strong>Note</strong>: This requires containerd 2.0+, 1.7.7+ or 1.6.25+. If you don’t have these patches for both <code>containerd</code> and <code>ctr</code>, you’ll encounter an error message like <code>mismatched image rootfs and manifest layers</code>. Latest versions of k3s and kind have the necessary containerd versions.</p>
+</blockquote>
+<h3 id="setup-1"><a class="header" href="#setup-1">Setup</a></h3>
+<p>Pull the OCI image with WASM layers:</p>
+<pre><code class="language-bash">make pull
+# or
+sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-oci:latest
+</code></pre>
+<h3 id="running-the-demo-1"><a class="header" href="#running-the-demo-1">Running the Demo</a></h3>
+<p>Run the image with your preferred runtime:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-oci:latest testwasmoci wasi-demo-oci.wasm echo 'hello'
+</code></pre>
+<p>Expected output:</p>
+<pre><code>hello
+exiting
+</code></pre>
+<p>To learn more about this approach, check the <a href="https://docs.google.com/document/d/11shgC3l6gplBjWF1VJCWvN_9do51otscAm0hBDGSSAc/edit">design document</a>.</p>
+<h2 id="demo-3-using-wasm-oci-artifact"><a class="header" href="#demo-3-using-wasm-oci-artifact">Demo 3: Using Wasm OCI Artifact</a></h2>
+<p>The <a href="https://tag-runtime.cncf.io/wgs/wasm/charter/">CNCF tag-runtime wasm working group</a> has defined an <a href="https://tag-runtime.cncf.io/wgs/wasm/deliverables/wasm-oci-artifact/">OCI Artifact format for Wasm</a>. This new artifact type enables usage across projects beyond just Runwasi.</p>
+<pre><code class="language-bash">make test/k8s-oci-wasmtime
+</code></pre>
+<blockquote>
+<p>Note: We use a Kubernetes cluster to run this demo since containerd’s ctr has a bug that results in: <code>unknown image config media type application/vnd.wasm.config.v0+json</code></p>
+</blockquote>
+<h2 id="wasihttp-demo-for-wasmtime-shim"><a class="header" href="#wasihttp-demo-for-wasmtime-shim">WASI/HTTP Demo for Wasmtime Shim</a></h2>
+<p>The <code>wasmtime-shim</code> includes support for the WASI/HTTP specification. For details on running HTTP-based WebAssembly modules, see the <a href="https://github.com/containerd/runwasi/blob/main/crates/containerd-shim-wasmtime/README.md#WASI/HTTP">wasmtime-shim documentation</a>.</p>
+<h2 id="using-different-webassembly-runtimes"><a class="header" href="#using-different-webassembly-runtimes">Using Different WebAssembly Runtimes</a></h2>
+<p>All demos can be run using any of the available Runwasi shims by replacing <code>wasmtime</code> with the runtime of your choice:</p>
+<ul>
+<li><strong>Wasmtime</strong>: <code>io.containerd.wasmtime.v1</code></li>
+<li><strong>WasmEdge</strong>: <code>io.containerd.wasmedge.v1</code></li>
+<li><strong>Wasmer</strong>: <code>io.containerd.wasmer.v1</code></li>
+<li><strong>WAMR</strong>: <code>io.containerd.wamr.v1</code></li>
+</ul>
+<p>For example:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmedge.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<h2 id="next-steps-1"><a class="header" href="#next-steps-1">Next Steps</a></h2>
+<ul>
+<li>Explore running WebAssembly workloads on Kubernetes in the <a href="getting-started/./quickstart.html">Quickstart with Kubernetes</a> guide</li>
+<li>Learn about the <a href="getting-started/../developer/architecture.html">Architecture</a> of Runwasi</li>
+<li>Check out <a href="getting-started/../CONTRIBUTING.html">Contributing</a> to get involved with the project</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="quickstart-with-kubernetes"><a class="header" href="#quickstart-with-kubernetes">Quickstart with Kubernetes</a></h1>
+<p>This guide will walk you through running WebAssembly workloads on Kubernetes using Runwasi.</p>
+<h2 id="prerequisites-2"><a class="header" href="#prerequisites-2">Prerequisites</a></h2>
+<p>Before getting started, ensure you have:</p>
+<ul>
+<li>Installed Runwasi shims as described in the <a href="getting-started/./installation.html">Installation Guide</a></li>
+<li>Basic familiarity with Kubernetes concepts</li>
+<li>Access to a Kubernetes cluster or the ability to create one using Kind or k3s</li>
+</ul>
+<h2 id="setting-up-kubernetes-for-webassembly"><a class="header" href="#setting-up-kubernetes-for-webassembly">Setting Up Kubernetes for WebAssembly</a></h2>
+<p>Runwasi enables WebAssembly workloads to run on Kubernetes by providing a containerd shim that interfaces with the Kubernetes container runtime interface (CRI). You can use either Kind or k3s for a local development environment.</p>
+<h3 id="option-1-using-kind"><a class="header" href="#option-1-using-kind">Option 1: Using Kind</a></h3>
+<p><a href="https://kind.sigs.k8s.io/">Kind</a> (Kubernetes IN Docker) is a tool for running local Kubernetes clusters using Docker containers as nodes.</p>
+<ol>
+<li>Install and configure dependencies:</li>
+</ol>
+<pre><code class="language-bash">curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/
+
+# Build and install the Wasmtime shim if you haven't already
+make build-wasmtime
+sudo make install-wasmtime
+</code></pre>
+<ol start="2">
+<li>Create a Kind configuration file:</li>
+</ol>
+<pre><code class="language-yaml"># kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: runwasi-cluster
+nodes:
+- role: control-plane
+  extraMounts:
+  - hostPath: /usr/local/bin/containerd-shim-wasmtime-v1
+    containerPath: /usr/local/bin/containerd-shim-wasmtime-v1
+</code></pre>
+<ol start="3">
+<li>Create and configure the cluster:</li>
+</ol>
+<pre><code class="language-bash">kind create cluster --name runwasi-cluster --config kind-config.yaml
+
+kubectl cluster-info --context kind-runwasi-cluster
+
+cat &lt;&lt; EOF | docker exec -i runwasi-cluster-control-plane tee /etc/containerd/config.toml
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes.wasm]
+  runtime_type = "io.containerd.wasmtime.v1"
+EOF
+
+docker exec runwasi-cluster-control-plane systemctl restart containerd
+</code></pre>
+<h3 id="option-2-using-k3s"><a class="header" href="#option-2-using-k3s">Option 2: Using k3s</a></h3>
+<p><a href="https://k3s.io/">k3s</a> is a lightweight, certified Kubernetes distribution designed for edge, IoT, CI, and development use cases.</p>
+<ol>
+<li>Install k3s and build the shim:</li>
+</ol>
+<pre><code class="language-bash">curl -sfL https://get.k3s.io | sh -
+
+# Build and install the Wasmtime shim if you haven't already
+make build-wasmtime
+sudo make install-wasmtime
+</code></pre>
+<ol start="2">
+<li>Configure k3s to use the WebAssembly runtime:</li>
+</ol>
+<pre><code class="language-bash">sudo mkdir -p /var/lib/rancher/k3s/agent/etc/containerd/
+
+cat &lt;&lt; EOF | sudo tee -a /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes.wasm]
+  runtime_type = "io.containerd.wasmtime.v1"
+EOF
+
+sudo systemctl restart k3s
+</code></pre>
+<h2 id="deploying-webassembly-workloads"><a class="header" href="#deploying-webassembly-workloads">Deploying WebAssembly Workloads</a></h2>
+<p>After setting up your Kubernetes cluster with Runwasi, you can deploy WebAssembly workloads.</p>
+<ol>
+<li>Create a deployment YAML file:</li>
+</ol>
+<pre><code class="language-yaml"># deploy.yaml
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: wasm
+handler: wasm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wasi-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wasi-demo
+  template:
+    metadata:
+      labels:
+        app: wasi-demo
+    spec:
+      runtimeClassName: wasm
+      containers:
+      - name: demo
+        image: ghcr.io/containerd/runwasi/wasi-demo-app:latest
+</code></pre>
+<ol start="2">
+<li>Apply the deployment with Kind:</li>
+</ol>
+<pre><code class="language-bash">kubectl --context kind-runwasi-cluster apply -f deploy.yaml
+</code></pre>
+<p>Or with k3s:</p>
+<pre><code class="language-bash">sudo k3s kubectl apply -f deploy.yaml
+</code></pre>
+<ol start="3">
+<li>
+<p>Check the status of your deployment:</p>
+<p>With Kind:</p>
+</li>
+</ol>
+<pre><code class="language-bash">kubectl --context kind-runwasi-cluster get pods
+kubectl --context kind-runwasi-cluster logs -l app=wasi-demo
+</code></pre>
+<p>With k3s:</p>
+<pre><code class="language-bash">sudo k3s kubectl get pods
+sudo k3s kubectl logs -l app=wasi-demo
+</code></pre>
+<p>You should see output like:</p>
+<pre><code>This is a song that never ends.
+Yes, it goes on and on my friends.
+Some people started singing it not knowing what it was,
+So they'll continue singing it forever just because...
+</code></pre>
+<h2 id="using-other-webassembly-runtimes"><a class="header" href="#using-other-webassembly-runtimes">Using Other WebAssembly Runtimes</a></h2>
+<p>You can use different WebAssembly runtimes by changing the runtime type in your containerd configuration:</p>
+<ul>
+<li>For WasmEdge:</li>
+</ul>
+<pre><code>runtime_type = "io.containerd.wasmedge.v1"
+</code></pre>
+<ul>
+<li>For Wasmer:</li>
+</ul>
+<pre><code>runtime_type = "io.containerd.wasmer.v1"
+</code></pre>
+<p>Make sure you’ve installed the corresponding shim binary.</p>
+<h2 id="cleaning-up"><a class="header" href="#cleaning-up">Cleaning Up</a></h2>
+<p>To remove your test deployment:</p>
+<p>With Kind:</p>
+<pre><code class="language-bash">kubectl --context kind-runwasi-cluster delete -f deploy.yaml
+kind delete cluster --name runwasi-cluster
+</code></pre>
+<p>With k3s:</p>
+<pre><code class="language-bash">sudo k3s kubectl delete -f deploy.yaml
+# Optionally uninstall k3s
+/usr/local/bin/k3s-uninstall.sh
+</code></pre>
+<h2 id="next-steps-2"><a class="header" href="#next-steps-2">Next Steps</a></h2>
+<p>Now that you’ve set up Kubernetes to run WebAssembly workloads:</p>
+<ul>
+<li>Learn about <a href="getting-started/../oci-decision-flow.html">OCI Integration</a> for container images</li>
+<li>Explore <a href="getting-started/../developer/architecture.html">Architecture Overview</a> to understand how Runwasi works</li>
+<li>Check out <a href="getting-started/../opentelemetry.html">OpenTelemetry Integration</a> for monitoring your WebAssembly workloads</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="windows-getting-started"><a class="header" href="#windows-getting-started">Windows: Getting Started</a></h1>
+<p>Currently, <strong>runwasi</strong> depends on a Linux environment (i.e., because it has to wire up networking and rootfs mounts). Therefore, to run it on Windows, we recommend utilizing the Windows Subsystem for Linux (WSL).</p>
+<p>To get started with WSL, see <a href="https://docs.microsoft.com/en-us/windows/wsl/install">this</a>.</p>
+<p>Once you have your WSL environment set and you have cloned the <strong>runwasi</strong> repository, you will need to install Docker and the Docker Buildx plugin.</p>
+<p>To install Docker and the Docker Buildx Plugin, see <a href="https://docs.docker.com/engine/install/">this</a> to find specific installation instructions for your WSL distro.</p>
+<p>Before proceeding, it’s also recommended to install Docker Desktop on Windows and run it once.</p>
+<p>To finish off installing pre-requisites, install Rust following <a href="https://www.rust-lang.org/tools/install">this</a>.</p>
+<p>After following these steps and navigating to the runwasi directory in your terminal:</p>
+<ul>
+<li>run <code>make build</code>,</li>
+<li>run <code>make install</code>,</li>
+<li>run <code>make pull-app</code>.</li>
+</ul>
+<p>After this, you can execute an example, like: <code>ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm</code>.</p>
+<blockquote>
+<p>To kill the process from the example, you can run: <code>ctr task kill -s SIGKILL testwasm</code>.</p>
+</blockquote>
+<h2 id="building-and-developing-on-windows"><a class="header" href="#building-and-developing-on-windows">Building and developing on Windows</a></h2>
+<p>You need to install <code>wasmedge</code>, <code>llvm</code> and <code>make</code>. This can be done using <code>winget</code>, <code>choco</code> or manually. (note as of writing this <code>winget</code> doesn’t have the latest package and will builds will fail).  See <code>.github/scripts/build-windows.sh</code> for an example.</p>
+<p>Once you have those dependencies you will need to set env:</p>
+<pre><code>$env:WASMEDGE_LIB_DIR="C:\Program Files\WasmEdge\lib"
+$env:WASMEDGE_INCLUDE_DIR="C:\Program Files\WasmEdge\include"    
+</code></pre>
+<p>Then you can run:</p>
+<pre><code>make build
+</code></pre>
+<h3 id="using-vs-code"><a class="header" href="#using-vs-code">Using VS code</a></h3>
+<p>If you are using VS Code for development you can use the following <code>settings.json</code> in the <code>.vscode</code> folder of the project:</p>
+<pre><code>{
+    "rust-analyzer.cargo.noDefaultFeatures": true,
+    "rust-analyzer.cargo.extraEnv": {
+        "WASMEDGE_LIB_DIR": "C:\\Program Files\\WasmEdge\\lib",
+        "WASMEDGE_INCLUDE_DIR": "C:\\Program Files\\WasmEdge\\include"
+    }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="architecture-overview"><a class="header" href="#architecture-overview">Architecture Overview</a></h1>
+<p>This document provides an overview of the Runwasi architecture and how it integrates with the container ecosystem.</p>
+<h2 id="high-level-architecture"><a class="header" href="#high-level-architecture">High-Level Architecture</a></h2>
+<p>Runwasi is designed as a library that can be integrated with WebAssembly runtimes to enable them to be used with containerd. The following diagram illustrates the high-level architecture:</p>
+<p><img src="developer/../assets/runwasi-architecture.png" alt="A diagram of runwasi architecture" /></p>
+<h2 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h2>
+<p>The Runwasi project is organized into several components:</p>
+<ul>
+<li><strong>containerd-shim-wasm</strong> - A higher level library that is used by WebAssembly runtimes to create shims. Most of the WebAssembly-specific shared code lives here.</li>
+<li><strong>containerd-shim-wasm-test-modules</strong> - Library with WebAssembly test modules used in the testing framework.</li>
+<li><strong>containerd-shim-&lt;runtime&gt;</strong> - Shim reference implementation for selected runtimes (wasmtime, wasmedge, wasmer, wamr, etc.). These produce binaries that are the shims which containerd can communicate with.</li>
+<li><strong>containerd-shimkit</strong> - A lower level, opinionated library providing a API for building containerd shims. It serves as the building block of <code>containerd-shim-wasm</code>.</li>
+<li><strong>oci-tar-builder</strong> - Library and executable that helps build OCI tar files that follow the <a href="https://tag-runtime.cncf.io/wgs/wasm/deliverables/wasm-oci-artifact/"><code>wasm-oci</code> spec</a>.</li>
+<li><strong>wasi-demo-app</strong> - WebAssembly application that is used for demos and testing.</li>
+</ul>
+<h2 id="components"><a class="header" href="#components">Components</a></h2>
+<h3 id="containerd-shim"><a class="header" href="#containerd-shim">Containerd Shim</a></h3>
+<p>The Containerd “shim” is a daemon process that serves the <a href="https://github.com/containerd/containerd/blob/v2.0.0/core/runtime/v2/README.md#tasks">Task Service API</a>. It listens on a socket to receive ttrpc requests from Containerd, allowing for lifecycle management for containers (create, start, stop, etc.).</p>
+<h3 id="runwasi-libraries"><a class="header" href="#runwasi-libraries">Runwasi Libraries</a></h3>
+<p>The core of Runwasi is the <code>containerd-wasm-shim</code> library crate.</p>
+<p>The <code>containerd-shim-wasm</code> crate provides a high-level API for building WebAssembly shims, mainly the <code>Engine</code> trait. The <code>Engine</code> trait has the following features:</p>
+<ol>
+<li><strong>Shim Implementation</strong>: It implements the containerd shim v2 API to facilitate communication between containerd and the WebAssembly runtime. This is done through the <code>containerd-shimkit</code>’s <code>Instance</code> trait (more on this trait below).</li>
+<li><strong>Wasm OCI Integration</strong>: Transparent handling of the <a href="https://tag-runtime.cncf.io/wgs/wasm/deliverables/wasm-oci-artifact/">wasm-oci spec</a>.</li>
+<li><strong>Wasm-specific Features</strong>: Support for Wasm module or component validation and precompilation.</li>
+</ol>
+<p>The <code>Engine</code> trait is built on top of the <code>containerd-shimkit</code>’s <code>Instance</code> trait. The <code>Instance</code> trait provides a low-level API for implementing containerd shims. It supports Linux, MacOS, and Windows and provides observability and tracing for monitoring shim operations. However, it also has limitations:</p>
+<ul>
+<li>It is <em>not</em> stable, and considered an implementation detail for <code>containerd-shim-wasm</code></li>
+<li>No precompilation out-of-the-box</li>
+<li>Does not support for native containers out-of-the-box</li>
+<li>Requires manual handling of cgroup setup</li>
+</ul>
+<h3 id="engine-types"><a class="header" href="#engine-types">Engine Types</a></h3>
+<p>Runwasi supports two types of engines:</p>
+<ol>
+<li><strong>WebAssembly / WASI Engine</strong>: Executes WebAssembly modules or components in a containerized process.</li>
+<li><strong>Youki Container Engine</strong>: Manages OCI-compliant native Linux container workloads. It offers functionality analogous to <a href="https://github.com/opencontainers/runc">runc</a>, including lifecycle operations for containers.</li>
+</ol>
+<p>Runwasi automatically detects the type of workload and decides which of the two modes to execute. This allows Runwasi shims to run WebAssembly workloads side-by-side with container workloads.</p>
+<h3 id="webassembly-runtime-integration"><a class="header" href="#webassembly-runtime-integration">WebAssembly Runtime Integration</a></h3>
+<p>Runwasi provides two approaches for integrating WebAssembly runtimes, depending on how much control you need over the container lifecycle and the level of sandboxing you want to provide:</p>
+<ol>
+<li>
+<p><strong><code>containerd_shim_wasm::Engine</code> Trait</strong>: A simpler interface for implementing a WebAssembly runtime that runs single containers. This approach uses <a href="https://github.com/youki-dev/youki">Youki</a>’s <code>libcontainer</code> crate to manage the container lifecycle (creating, starting, and deleting containers), and Youki handles container sandboxing for you. The <code>Engine</code> trait provides several methods you can implement:</p>
+<ul>
+<li><code>name()</code> - Returns the name of the engine (required)</li>
+<li><code>run_wasi()</code> - Executes the WebAssembly module (required)</li>
+<li><code>can_handle()</code> - Validates that the runtime can run the container (optional, checks Wasm file headers by default)</li>
+<li><code>supported_layers_types()</code> - Returns supported OCI layer types (optional)</li>
+<li><code>precompile()</code> - Allows precompilation of WebAssembly modules (optional)</li>
+<li><code>can_precompile()</code> - Indicates if the runtime supports precompilation (optional)</li>
+</ul>
+</li>
+<li>
+<p><strong><code>containerd_shimkit::sandbox::Instance</code> Trait</strong>: A more flexible but complex interface for implementing a WebAssembly runtime that needs direct control over the container lifecycle. This approach gives you full control over how containers are created, started, and managed. The <code>Instance</code> trait requires implementing methods like:</p>
+<ul>
+<li><code>new()</code> - Creates a new instance</li>
+<li><code>start()</code> - Starts the instance</li>
+<li><code>kill()</code> - Sends signals to the instance</li>
+<li><code>delete()</code> - Cleans up the instance</li>
+<li><code>wait_timeout()</code> - Waits for the instance to exit</li>
+</ul>
+</li>
+</ol>
+<p>The choice between these approaches depends on your specific use case. Most WebAssembly runtimes should use the <code>Engine</code> trait for simplicity, while more complex scenarios requiring custom container management would use the <code>Instance</code> trait directly.</p>
+<h2 id="process-model"><a class="header" href="#process-model">Process Model</a></h2>
+<p>[TODO] Process Model section to be completed.</p>
+<h2 id="integration-with-container-ecosystem"><a class="header" href="#integration-with-container-ecosystem">Integration with Container Ecosystem</a></h2>
+<p>For more details on the OCI integration, see the <a href="developer/../oci-decision-flow.html">OCI Decision Flow</a> document.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="oci-pre-compilation"><a class="header" href="#oci-pre-compilation">OCI pre-compilation</a></h1>
+<p>The OCI images layers are loaded from containerd.  If the runtime supports pre-compilation the images will be precompiled and cached using the containerd content store.</p>
+<pre class="mermaid">graph TD
+    start[Task new]
+    imgconfig[Load image config from containerd]
+    iswasm{Arch==wasm?}
+    alreadycompiled{Does image label for shim runtime version exist? runwasi.io/precompiled/runtime/version}
+    startcontainer[Create Container]
+    precompiledenabled{Is precompiling enabled in shim?}
+    precompiledenabled2{Is precompiling enabled in shim?}
+    fetchcache[Fetch cached precompiled layer from containerd content store]
+    precompile[Precompile using wasm runtime]
+    loadoci[Load OCI layers from containerd]
+    storecache[Store precompiled layer in containerd content store]
+
+    start --&gt; imgconfig --&gt; iswasm
+    iswasm -- yes --&gt; precompiledenabled 
+    iswasm -- no. wasm will be loaded from file inside image --&gt; startcontainer
+
+    precompiledenabled -- yes --&gt; alreadycompiled
+    precompiledenabled -- no --&gt; loadoci --&gt; precompiledenabled2 
+
+    alreadycompiled -- yes --&gt; fetchcache --&gt; startcontainer
+    alreadycompiled -- no --&gt; loadoci 
+
+    precompiledenabled2 -- yes --&gt; precompile --&gt; storecache --&gt; startcontainer
+    precompiledenabled2 -- no --&gt; startcontainer
+</pre>
+<p>Once a wasm module or component is pre-compiled it will remain in the containerd content store until the original image is removed from containerd.  There is a small disk overhead associated with this but it reduces the complexity of managing stored versions during upgrades.</p>
+<p>To view the images in containerd that have associated pre-compilations:</p>
+<pre><code class="language-bash">sudo ctr i ls | grep "runwasi.io"
+ghcr.io/containerd/runwasi/wasi-demo-oci:latest                                                             application/vnd.oci.image.manifest.v1+json
+               sha256:60fccd77070dfeb682a1ebc742e9d677fc452b30a6b99188b081c968992394ce 2.4 MiB   wasi/wasm                                                                                                                           
+runwasi.io/precompiled/wasmtime/0.3.1=sha256:b36753ab5a46f26f6bedb81b8a7b489cede8fc7386f1398706782e225fd0a98e
+
+# query for the sha in the label
+sudo ctr content ls | grep "b36753ab5a46f26f6bedb81b8a7b489cede8fc7386f139870"
+sha256:60fccd77070dfeb682a1ebc742e9d677fc452b30a6b99188b081c968992394ce 561B    2 months        containerd.io/gc.ref.content.0=sha256:a3c18cd551d54d3cfbf67acc9e8f7ef5761e76827fe7c1ae163fca0193be88b3,containerd.io/gc.ref.content.config=sha256:85b7f2b562fe8665ec9d9e6d47ab0b24e2315627f5f558d298475c4038d71e8b,containerd.io/gc.ref.content.precompile=sha256:b36753ab5a46f26f6bedb81b8a7b489cede8fc7386f1398706782e225fd0a98e
+sha256:b36753ab5a46f26f6bedb81b8a7b489cede8fc7386f1398706782e225fd0a98e 626.4kB 3 days          runwasi.io/precompiled=sha256:60fccd77070dfeb682a1ebc742e9d677fc452b30a6b99188b081c968992394ce
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="contributors-guide"><a class="header" href="#contributors-guide">Contributors’ Guide</a></h1>
+<p>This guide will help familiarize contributors to the <code>containerd/runwasi</code> repository.</p>
+<h2 id="prerequisite"><a class="header" href="#prerequisite">Prerequisite</a></h2>
+<p>First read the containerd project’s <a href="https://github.com/containerd/project/blob/main/CONTRIBUTING.md">general guidelines around contribution</a>
+which apply to all containerd projects.</p>
+<h2 id="setting-up-your-local-environment"><a class="header" href="#setting-up-your-local-environment">Setting up your local environment</a></h2>
+<p>At a minimum, the Rust toolchain.  When using <code>rustup</code> the correct toolchain version is picked up from the <a href="https://github.com/containerd/runwasi/blob/main/rust-toolchain.toml">rust-toolchain.toml</a> file so you don’t need to worry about the version.</p>
+<blockquote>
+<pre><code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+</code></pre>
+</blockquote>
+<p>There are a few helper scripts that will install and configure required packages based on your OS. The end-to-end tests require a static binary, so installing <a href="https://github.com/cross-rs/cross">cross-rs</a> is recommended.</p>
+<p>If on ubuntu/debian you can use the following script. Refer to <a href="https://github.com/containers/youki#dependencies">youki’s</a> documentation for other systems.</p>
+<pre><code>./scripts/setup-linux.sh
+</code></pre>
+<p>If on Windows use (use <a href="https://gitforwindows.org/">git BASH</a> terminal which has shell emulator)</p>
+<pre><code>./scripts/setup-windows.sh
+</code></pre>
+<p>If you choose to always build with <a href="https://github.com/cross-rs/cross">cross</a>, you don’t need any of these requirements above as they will be provided via the cross container.  This does require <code>docker</code> or <code>podman</code>. Refer to the <a href="https://github.com/cross-rs/cross/wiki/Getting-Started">cross getting started page</a> for more details.</p>
+<p>Install cross:</p>
+<pre><code>scripts/setup-cross.sh
+</code></pre>
+<h2 id="project-structure-and-architecture"><a class="header" href="#project-structure-and-architecture">Project structure and architecture</a></h2>
+<p>For a detailed overview of the Runwasi structure and architecture, please refer to the <a href="https://runwasi.dev/developer/architecture.html">Architecture Documentation</a>.</p>
+<p>The documentation covers:</p>
+<ul>
+<li>High-level structure of Runwasi</li>
+<li>Component descriptions and interactions</li>
+<li>WebAssembly runtime integration approaches</li>
+<li>Process model and container ecosystem integration</li>
+</ul>
+<h2 id="building-the-project"><a class="header" href="#building-the-project">Building the project</a></h2>
+<p>To build all the shims in this repository:</p>
+<pre><code>make build
+</code></pre>
+<p>To build a shim for specific runtime (wasmtime, wasmer, wasmedge, wamr, etc):</p>
+<pre><code>make build-&lt;runtime&gt;
+</code></pre>
+<p>By default the runtimes will build for your current OS and architecture.  If you want to build for a specific OS and architecture you can specify <code>TARGET</code>, where it matches a target in “Cross.toml”. If your target doesn’t match your host OS and architecture <a href="https://github.com/cross-rs/cross">Cross</a> will be used. As an example will build a static binary:</p>
+<pre><code>TARGET=x86_64-unknown-linux-musl make build
+</code></pre>
+<h2 id="running-tests"><a class="header" href="#running-tests">Running tests</a></h2>
+<h3 id="unit-tests"><a class="header" href="#unit-tests">Unit tests</a></h3>
+<p>Unit tests are run via <code>make test</code>  or for a specific runtime <code>make test-&lt;runtime&gt;</code>. On linux the tests will run using <code>sudo</code>. This is configured in the <code>runner</code> field in “.cargo/config.toml”</p>
+<p>You should see some output like:</p>
+<pre><code class="language-terminal">make test
+running 3 tests
+test instance::tests::test_maybe_open_stdio ... ok
+test instance::wasitest::test_delete_after_create ... ok
+test instance::wasitest::test_wasi ... ok
+</code></pre>
+<p>Run individual test via cargo adding <code>RUST_LOG=trace</code> (adjust the level of logging as needed) to see shim output. Also adjust the test name as needed.</p>
+<pre><code>RUST_LOG=DEBUG cargo test --package containerd-shim-wasmtime --lib -- wasmtime_tests::test_hello_world --exact --nocapture
+</code></pre>
+<h3 id="end-to-end-tests"><a class="header" href="#end-to-end-tests">End to End tests</a></h3>
+<p>The e2e test run on <a href="https://k3s.io/">k3s</a> and <a href="https://kind.sigs.k8s.io/">kind</a>.  A test image is built using <a href="https://github.com/containerd/runwasi/tree/main/crates/oci-tar-builder">oci-tar-builder</a> and is loaded onto the clusters.  This test image is not pushed to an external registry so be sure to use the Makefile targets to build the image and load it on the cluster.</p>
+<p>The deployment file in <a href="https://github.com/containerd/runwasi/blob/main/test/k8s/Dockerfile">test/k8s/Dockerfile</a> is run and verified that it deploys and runs successfully.  To execute the e2e tests in either kind or k3s:</p>
+<pre><code>make test/k8s-&lt;runtime&gt; # runs using kind
+make test/k3s-&lt;runtime&gt;
+</code></pre>
+<p>OCI Wasm image requires containerd 1.7.7+ and can be tested with:</p>
+<pre><code>make test/k8s-oci-&lt;runtime&gt;
+</code></pre>
+<h3 id="building-the-test-image"><a class="header" href="#building-the-test-image">Building the test image</a></h3>
+<p>This builds a <a href="https://github.com/containerd/runwasi/tree/main/crates/wasi-demo-app/">wasm application</a> and packages it in an OCI format:</p>
+<pre><code>make test-image
+</code></pre>
+<h2 id="code-style"><a class="header" href="#code-style">Code style</a></h2>
+<p>We use nightly <a href="https://github.com/rust-lang/rustfmt"><code>rustfmt</code></a> and <a href="https://github.com/rust-lang/rust-clippy"><code>clippy</code></a> for most linting rules. They are installed automatically with rustup. Use the <code>check</code> makefile target to run these tools and verify your code matches the expected style.</p>
+<pre><code>make check
+</code></pre>
+<p>You can auto-fix most styles using</p>
+<pre><code>make fix
+</code></pre>
+<h2 id="adding-new-features"><a class="header" href="#adding-new-features">Adding new features</a></h2>
+<p>Most features will likely have most of the code in the <code>containerd-shim-wasm</code> project and a few runtime specific additions to each runtime shim.  The general expectation is that the feature should be added to all runtimes. We will evaluate on a case by case basis exceptions, where runtimes may not be able to support a given feature or requires changes that make it hard to review.  In those cases we it may make sense to implement in follow up PR’s for other runtimes.</p>
+<p>A tip for developing a new feature is to implement it and test it with one runtime you are familiar with then add it to all the runtimes.  This makes it easier to test and iterate before making changes across all the runtimes.</p>
+<p>Any changes made to the <code>containerd-shim-wasm</code> crate needs to be documented in the <a href="https://github.com/containerd/runwasi/blob/main/crates/containerd-shim-wasm/CHANGELOG.md">CHANGELOG.md</a> file following the <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a> format.</p>
+<h2 id="adding-new-shims"><a class="header" href="#adding-new-shims">Adding new shims</a></h2>
+<p>We welcome new shims, though you can also host them in your own repositories as well and use the <code>coantainerd-shim-wasm</code> crate.  We recognize that the project is moving fast and having them in this repository can reduce the need for changes as well for discoverability.</p>
+<p>Please open an issue before submitting a PR for discussion to make sure it is a good fit.  As a general rule, we want shims to be adopting WASI spec (this is after all called run<em>wasi</em> :-)). In the future we may require shims in the repository to pass WASI compliance tests when the standards mature more. See https://github.com/containerd/runwasi/issues/338 for more discussion.</p>
+<p>Since we are not experts in every runtime we also need a commitment from the runtime owners to contribute to maintenance of the shim.</p>
+<h2 id="removing-shims"><a class="header" href="#removing-shims">Removing Shims</a></h2>
+<p>This is a fast moving space, with lots of innovation happening and some shims may eventually need to be removed.</p>
+<p>A Shim implementation maybe subject to removal if:</p>
+<ul>
+<li>If a shim runtime has not been maintained for 6 months it will be subject to removal.</li>
+<li>If required changes to the runtime can’t be merged or not supported by runtime maintainers.</li>
+<li>If it falls behind in new features added to the <code>containerd-shim-wasm</code> due to lack of maintenance</li>
+</ul>
+<p>Before removal:</p>
+<ul>
+<li>We will create an issue in the repository, pinned to the top.</li>
+<li>Send notification in our slack channel</li>
+<li>make best effort to contact the maintainers (agreed to when adding the shim)</li>
+</ul>
+<p>After 1 month of the issue being up, if no maintainer is found we will remove the shim from the project.</p>
+<p>In the case where immediate actions are required we may remove a shim from the CI signal to unblock progress on a feature or bug.  This will be done on a case by case basis when needing to resolve an issue immediately. We will open an issue to track the removal from CI and if we are not able to resolved (or make progress on resolving) with in the next two weeks we will start the steps for removal.</p>
+<h2 id="getting-in-touch"><a class="header" href="#getting-in-touch">Getting in touch</a></h2>
+<p>There is a lot going on in the project. If you get lost, stop by our <a href="./README.html#community">slack and ask questions</a>!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="documentation-website"><a class="header" href="#documentation-website">Documentation website</a></h1>
+<p>This project uses the <a href="https://rust-lang.github.io/mdBook/">mdBook</a> tool to generate a documentation website from
+markdown files. The website is hosted on GitHub Pages and is available at the
+following URL: <a href="https://runwasi.dev/">https://runwasi.dev/</a>.</p>
+<h2 id="building-the-documentation"><a class="header" href="#building-the-documentation">Building the documentation</a></h2>
+<p>To build the documentation, you need to have the <code>mdbook</code> tool installed. You
+can install it using the following command:</p>
+<pre><code class="language-bash">cargo install mdbook
+</code></pre>
+<p>Once you have <code>mdbook</code> installed, you can build the documentation by running the
+following command:</p>
+<pre><code class="language-bash">mdbook build
+</code></pre>
+<p>This will generate the documentation in the <code>book</code> directory. You can verify
+locally by running:</p>
+<pre><code class="language-bash">mdbook serve
+</code></pre>
+<p>which will start a local web server at <code>http://localhost:3000</code> where you can
+view the documentation.</p>
+<h2 id="contributing-1"><a class="header" href="#contributing-1">Contributing</a></h2>
+<p>If you would like to contribute to the documentation, you can do so by editing
+the markdown files in the <code>src</code> directory. Once you have made your changes, you
+can build the documentation as described above and verify that your changes are
+correct.</p>
+<p>If you are happy with your changes, you can submit a pull request to the <code>main</code>
+branch of the repository. Once your pull request is merged, the changes will be
+automatically published to the documentation website.</p>
+<h2 id="deploying-the-documentation"><a class="header" href="#deploying-the-documentation">Deploying the documentation</a></h2>
+<p>The documentation is automatically deployed to GitHub Pages when changes are
+merged to the <code>main</code> branch.
+To deploy the documentation, the following github actions are used:</p>
+<ul>
+<li><a href="https://github.com/peaceiris/actions-mdbook">actions-mdbook</a> for building the
+documentation.</li>
+<li><a href="https://github.com/peaceiris/actions-gh-pages">actions-gh-pages</a> for
+deploying the documentation to GitHub Pages.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="release-process"><a class="header" href="#release-process">Release Process</a></h1>
+<p>This document describes the steps to release a new version of the crate or wasi-demo-app images.</p>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="RELEASE.html#crate-release-process">Crate Release Process</a>
+<ul>
+<li><a href="RELEASE.html#overview">Overview</a></li>
+<li><a href="RELEASE.html#input-values-for-releaseyml">Input Values for Release.yml</a></li>
+<li><a href="RELEASE.html#crate-release-sequence">Crate Release Sequence</a></li>
+<li><a href="RELEASE.html#release-steps">Release Steps</a></li>
+<li><a href="RELEASE.html#local-development-vs-release">Local Development vs. Release</a></li>
+<li><a href="RELEASE.html#verify-signing">Verify signing</a></li>
+<li><a href="RELEASE.html#first-time-release-of-a-crate">First time release of a crate</a></li>
+<li><a href="RELEASE.html#release-workflow-summary">Release workflow summary</a></li>
+</ul>
+</li>
+<li><a href="RELEASE.html#wasi-demo-app-release-process">wasi-demo-app Release Process</a>
+<ul>
+<li><a href="RELEASE.html#overview-1">Overview</a></li>
+<li><a href="RELEASE.html#verify-signing-1">Verify signing</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="crate-release-process"><a class="header" href="#crate-release-process">Crate Release Process</a></h2>
+<h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>To create a new release, either run the release.yml workflow as a workload_dispatch trigger through the GitHub UI, or via the following command substituting the proper values for crate and version.</p>
+<pre><code class="language-bash">gh workflow run release.yml -f dry_run=true -f crate=containerd-shim-wasm -f version=0.4.0
+</code></pre>
+<h3 id="input-values-for-releaseyml"><a class="header" href="#input-values-for-releaseyml">Input Values for Release.yml</a></h3>
+<ul>
+<li><code>crate:</code> [string] the name of the crate within the runwasi project. It should be a directory under <code>./crates</code>.</li>
+<li><code>version:</code> [string] the version of the crate to stamp, tag, and release (e.g., 1.0.0, 0.6.0-rc1)</li>
+<li><code>dry_run:</code> [boolean] a flag that causes the workflow to run all step except ones that would tag or push artifacts.</li>
+</ul>
+<h3 id="crate-release-sequence"><a class="header" href="#crate-release-sequence">Crate Release Sequence</a></h3>
+<p>Must release the creates in this order due to dependencies:</p>
+<ol>
+<li><code>containerd-shimkit</code></li>
+<li><code>containerd-shim-wasm</code></li>
+<li>All runtime-related crates.</li>
+</ol>
+<h3 id="release-steps"><a class="header" href="#release-steps">Release Steps</a></h3>
+<ol>
+<li>Open a PR to bump crate versions and dependency versions in <code>Cargo.toml</code> for that crate, and change the “Unreleased” section in the <code>CHANGELOG.md</code> to the new version.</li>
+<li>PR can be merged after 2 LGTMs</li>
+<li>Run the release workflow for the dependent crate. (e.g. <code>containerd-shim-wasm/v0.2.0</code> where <code>crate=containerd-shim-wasm</code> and <code>version=0.2.0</code>)</li>
+<li>Wait for the release workflow to complete</li>
+<li>Manually verify the release on crates.io and on the GitHub releases page (See <a href="RELEASE.html#Verify-signing">Verify signing</a> section for more details on verifying the release on GitHub releases page.)</li>
+<li>If this is the first time publishing this crate, see the <a href="RELEASE.html#First-release-of-a-crate">First release of a crate</a> section.</li>
+</ol>
+<blockquote>
+<p>Note: If step 1 and/or 2 is skipped, the release workflow will fail because the version in the Cargo.toml will not match the tag.</p>
+<p>For step 5, some crates have binaries, such as the containerd-shim-wasmtime crate. These binaries are built as part of the release workflow and uploaded to the GitHub release page. You can download the binaries from the release page and verify that they work as expected.</p>
+</blockquote>
+<h3 id="local-development-vs-release"><a class="header" href="#local-development-vs-release">Local Development vs. Release</a></h3>
+<p>Locally, crates reference local paths. During release, they target published versions.
+Use both <code>path</code> and <code>version</code> fields in the workspace <code>Cargo.toml</code>:</p>
+<p>e.g.</p>
+<pre><code class="language-toml">containerd-shim-wasm = { path = "crates/containerd-shim-wasm", version = "0.4.0" }
+</code></pre>
+<h3 id="verify-signing"><a class="header" href="#verify-signing">Verify signing</a></h3>
+<p>The release pipeline uses <code>cosign</code> to sign the release blobs, if any. It uses Github’s OIDC token to authenticate with Sigstore to prove identity and outputs a <code>.bundle</code> file, which contains a signature and a key. This file can be verified using <code>cosign verify-blob</code> command, providing the workflow tag and Github as the issuer. The full command looks like this (e.g. wasmtime shim):</p>
+<pre><code class="language-sh">cosign verify-blob --bundle containerd-shim-wasmtime-v1.bundle \
+--certificate-identity https://github.com/containerd/runwasi/.github/workflows/release.yml@refs/tags/containerd-shim-wasmtime/&lt;tag&gt; \ 
+--certificate-oidc-issuer https://token.actions.githubusercontent.com \
+containerd-shim-wasmtime-v1
+</code></pre>
+<p>In the Github release page, please provide the above command in the instructions for the consumer to verify the release.</p>
+<h3 id="first-time-release-of-a-crate"><a class="header" href="#first-time-release-of-a-crate">First time release of a crate</a></h3>
+<p>If the crate has never been published to crates.io before then ownership of the crate will need to be configured.</p>
+<ol>
+<li>You should pass <code>initial_release=true</code> to the release workflow to skip the ownership step.</li>
+<li>The containerd/runwasi-committers team will need to be added as an owner of the crate.</li>
+</ol>
+<p>The release workflow will automatically invite the person who triggered the workflow run to be an owner of the crate.
+That person will need to accept the invite to be an owner of the crate and then manually add the containerd/runwasi-committers team as an owner of the crate.</p>
+<pre><code>cargo owner --add github:containerd:runwasi-committers &lt;crate-name&gt;
+</code></pre>
+<p><em>This assumes you’ve already done <code>cargo login</code> with your personal account.
+Alternatively, the cargo cli does support setting the token via an environment variable, <code>CARGO_REGISTRY_TOKEN</code> or as a CLI flag.</em></p>
+<p>Now all members of the containerd/runwasi-committers team will have access to manage the crate (after they have accepted the invite to the crate).</p>
+<h3 id="release-workflow-summary"><a class="header" href="#release-workflow-summary">Release workflow summary</a></h3>
+<p>The workflow performs the following steps:</p>
+<ul>
+<li>Verifies inputs</li>
+<li>Verifies ability to push crates</li>
+<li>Updates the version of the crate to the version specified in the workflow input</li>
+<li>Build the crate to be released (determined by the tag), including any artifacts (e.g., associated binaries)</li>
+<li>Run the tests for that crate (and only that crate!)</li>
+<li>Publishes to the crates.io</li>
+<li>Tags the repository for the release</li>
+<li>Creates a GitHub release for that crate (attaching any artifacts)</li>
+</ul>
+<p>The workflow utilizes a bot account (@containerd-runwasi-release-bot) to publish the crate to crates.io. The bot account is only used to get a limited-scope API token to publish the crate on crates.io. The token is stored as a secret in the repository and is only used by the release workflow.</p>
+<h2 id="wasi-demo-app-release-process"><a class="header" href="#wasi-demo-app-release-process"><code>wasi-demo-app</code> Release Process</a></h2>
+<h3 id="overview-1"><a class="header" href="#overview-1">Overview</a></h3>
+<p>To release a new version of the wasi-demo-app images, run the release-wasi-demo-app.yml workflow using the following command, substituting the correct version:</p>
+<pre><code class="language-bash">gh workflow run release-wasi-demo-app.yml -f dry_run=false -f version=0.1.0
+</code></pre>
+<h3 id="verify-signing-1"><a class="header" href="#verify-signing-1">Verify signing</a></h3>
+<p>To verify the signature of the release, run the following command:</p>
+<pre><code class="language-bash">cosign verify ghcr.io/containerd/runwasi/wasi-demo-app:0.1.0 --certificate-identity https://github.com/containerd/runwasi/.github/workflows/sign.yml@refs/heads/main --certificate-oidc-issuer https://token.actions.githubusercontent.com
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="project-roadmap"><a class="header" href="#project-roadmap">Project Roadmap</a></h1>
+<p>This document outlines the future development plans for Runwasi. It serves as a guide for contributors and users to understand where the project is headed.</p>
+<h2 id="current-status-and-10-release-plan"><a class="header" href="#current-status-and-10-release-plan">Current Status and 1.0 Release Plan</a></h2>
+<p>Runwasi is currently in active development and targeting a stable 1.0 release in the upcoming months. The project tracks development priorities and progress on the <a href="https://github.com/orgs/containerd/projects/8/views/1">Runwasi Project Board</a>.</p>
+<p>The 1.0 release will mark an important milestone for Runwasi, providing a stable API and features that are ready for production use.</p>
+<h2 id="contributing-to-the-roadmap"><a class="header" href="#contributing-to-the-roadmap">Contributing to the Roadmap</a></h2>
+<p>We welcome contributions to help us achieve these goals! If you’re interested in contributing:</p>
+<ol>
+<li>Check the <a href="https://github.com/orgs/containerd/projects/8/views/1">Project Board</a> for current priorities</li>
+<li>Join discussions on <a href="https://github.com/containerd/runwasi/issues">GitHub Issues</a></li>
+<li>Participate in <a href="developer/../resources/community.html">community meetings and discussions</a></li>
+<li>Review the <a href="developer/../CONTRIBUTING.html">Contributing Guide</a> for detailed information on how to get involved</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="runwasi-benchmarks"><a class="header" href="#runwasi-benchmarks">Runwasi Benchmarks</a></h1>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<p>This document outlines the various methods and ideas for benchmarking <code>runwasi</code> shims. The goal is to provide a structured approach to measuring the performance of the <code>runwasi</code> shims and comparing it against other container runtimes, such as <code>runc</code> or <code>crun</code>. These benchmarks will help track performance changes across different versions and explore how well <code>runwasi</code> scales in high-density environments.</p>
+<h2 id="benchmarking-goals"><a class="header" href="#benchmarking-goals">Benchmarking Goals</a></h2>
+<ol>
+<li>Establish a baseline performance for <code>runwasi</code> shims</li>
+<li>Measure the impact of changes to the source code and version upgrades on performance</li>
+<li>Test the density of <code>runwasi</code> shims in a single node.</li>
+<li>Visualize the performance data over time.</li>
+<li>Identify areas for further optimizations</li>
+</ol>
+<h2 id="approaches"><a class="header" href="#approaches">Approaches</a></h2>
+<h3 id="1-baseline-performance"><a class="header" href="#1-baseline-performance">1. Baseline Performance</a></h3>
+<p>To establish a baseline performance, we use the “ghcr.io/containerd/runwasi/wasi-demo-app:latest” and “ghcr.io/containerd/runwasi/wasi-demo-oci:latest” images. These images are simple demo apps that echoes <code>"hello"</code> to the console using WASI. We run end-to-end benchmarks for <code>wasmtime</code>, <code>wasmedge</code>, <code>wasmer</code> and <code>wamr</code> runtimes and measure the execution duration. The result can be found in <a href="https://runwasi.dev/dev/bench">dev/bench</a> website, under the “Criterion.rs Benchmark” section.</p>
+<p>The source code for the benchmarks can be found in <a href="https://github.com/containerd/runwasi/tree/containerd-shim-wasm/v0.9.0/benches/containerd-shim-benchmarks">benchs/containerd-shim-benchmarks</a> directory.</p>
+<h3 id="2-stress-test"><a class="header" href="#2-stress-test">2. Stress Test</a></h3>
+<p><a href="https://github.com/containerd/runwasi/tree/containerd-shim-wasm/v0.9.0/crates/stress-test">stress-test</a> is a CLI that runs a stress test for the <code>runwasi</code> shims. It allows us to deploy a large number of Wasm-based tasks to evaluate task throughput (number of tasks finished per second) under high-density environments. The stress test supports running workloads with mocked containerd server and a real containerd server and supports running <code>N</code> tasks in total with <code>M</code> concurrent tasks. The result can be found in <a href="https://runwasi.dev/dev/bench">dev/bench</a> website, under the “Stress Test Benchmark” section.</p>
+<h3 id="3-memory"><a class="header" href="#3-memory">3. Memory</a></h3>
+<p>We’ve added functions to collect memory usage data from the shim and zygote processes. We use <code>scripts/benchmark-mem.sh</code> script to collect the data. The result can be found in<a href="https://runwasi.dev/dev/bench">dev/bench</a> website, under the “Criterion.rs Benchmark” section.</p>
+<h3 id="4-networking"><a class="header" href="#4-networking">4. Networking</a></h3>
+<p>This is for Wasmtime shim. We use <code>hey</code> to load test the Wasmtime shim running “ghcr.io/containerd/runwasi/wasi-demo-http:latest” workload. We measure the HTTP throughput and latency of the workload. The result can be found in <a href="https://runwasi.dev/dev/bench">dev/bench</a> website, under the “HTTP Throughput” and “HTTP Latency” sections.</p>
+<h3 id="5-runwasi-vs-native-execution"><a class="header" href="#5-runwasi-vs-native-execution">5. Runwasi vs. Native Execution</a></h3>
+<p>We built a distroless container image with <code>wasmtime</code> runtime installed. Then we run stress-test for <code>wasmtime</code> shim and the distroless container for the same workload. The result is shown below.</p>
+<div class="table-wrapper"><table><thead><tr><th>Runtime</th><th>Tasks</th><th>Time</th><th>Throughput</th></tr></thead><tbody>
+<tr><td>runwasi wasmtime</td><td>1000</td><td>3s 31ms 663us 672ns</td><td>329.85 tasks/s</td></tr>
+<tr><td>runc distroless wasmtime</td><td>1000</td><td>11s 795ms 27us 285ns</td><td>84.78 tasks/s</td></tr>
+</tbody></table>
+</div>
+<p>The Dockerfile for the distroless container is shown below.</p>
+<pre><code class="language-Dockerfile"># syntax=docker/dockerfile:1.13-labs
+FROM rust AS build-base
+RUN rustup target add x86_64-unknown-linux-musl
+RUN apt-get update -y &amp;&amp; apt-get install musl-tools -y
+
+FROM build-base AS wasmtime-build
+RUN cargo install \
+    --target='x86_64-unknown-linux-musl' \
+    --profile='fastest-runtime' \
+    --config='profile.fastest-runtime.strip="symbols"' \
+    --config='profile.fastest-runtime.panic="abort"' \
+    wasmtime-cli
+RUN cp $(which wasmtime) /wasmtime
+
+FROM scratch AS wasmtime
+COPY --from=wasmtime-build /wasmtime /
+
+FROM build-base AS wasm-tools
+RUN cargo install wasm-tools
+
+FROM wasm-tools AS build
+COPY hello.wat /
+RUN wasm-tools parse &lt;/hello.wat &gt;/hello.wasm
+
+FROM wasmtime AS final
+COPY --from=build /hello.wasm /
+ENTRYPOINT ["/wasmtime", "/hello.wasm"]
+</code></pre>
+<h3 id="6-visualize-the-performance-data"><a class="header" href="#6-visualize-the-performance-data">6. Visualize the Performance Data</a></h3>
+<p>We use <a href="https://github.com/benchmark-action/github-action-benchmark">benchmark-action</a> to visualize the performance data and we have a benchmark CI job that runs every day at midnight UTC. It will aggregate the result from the daily benchmark and visualize it in a chart. Any regression detected will be notifying to the runwasi-committers group. The result can be found in <a href="https://runwasi.dev/dev/bench">dev/bench</a> website.</p>
+<p><img src="assets/benchmark-website.png" alt="Benchmark Report" /></p>
+<h3 id="contributing-to-the-benchmarks"><a class="header" href="#contributing-to-the-benchmarks">Contributing to the Benchmarks</a></h3>
+<p>If you want to contribute to the benchmarks, whether it’s adding a new benchmark or improving the existing ones, or just want to share your ideas, please refer to the following issue:</p>
+<ul>
+<li><a href="https://github.com/containerd/runwasi/issues/97">Bencharking issue #97</a></li>
+</ul>
+<p>Any PRs are welcome!</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="opentelemetry"><a class="header" href="#opentelemetry">OpenTelemetry</a></h1>
+<p><a href="https://opentelemetry.io/">OpenTelemetry</a> is a set of libraries, agents, and instrumentation to provide observability (metrics, logs and traces) in applications.</p>
+<p><code>containerd-shim-wasm</code> crate has a set of APIs to enable OpenTelemetry tracing in the shim. This document is a guide on how to use OpenTelemetry tracing in your shim.</p>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<blockquote>
+<p>Wasmtime shim v0.5.0 has OpenTelemetry tracing enabled by default</p>
+</blockquote>
+<p>To use OpenTelemetry tracing in your shim, you need to use the <code>opentelemetry</code> feature in the <code>containerd-shim-wasm</code> crate.</p>
+<pre><code class="language-toml">containerd-shim-wasm = { workspace = true, features = ["opentelemetry"] }
+</code></pre>
+<p>Then, you may use the <code>containerd_shim_wasm::sandbox::cli::shim_main</code> function to run the shim with OpenTelemetry tracing.</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    shim_main::&lt;WasmtimeInstance&gt;(version!(), revision!(), None);
+}</code></pre></pre>
+<p>You may also use the <code>containerd_shim_wasm::sandbox::shim::OtlpConfig</code> struct to configure the OpenTelemetry tracing manually.</p>
+<h3 id="running-containerd-with-opentelemetry"><a class="header" href="#running-containerd-with-opentelemetry">Running containerd with OpenTelemetry</a></h3>
+<p>You can configure / run containerd with OpenTelemetry tracing. Please refer to the <a href="https://github.com/containerd/containerd/blob/v2.0.0/docs/tracing.md#sending-traces-from-containerd-daemon">containerd documentation</a> for more information.</p>
+<pre><code class="language-sh">OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+
+# by default, Containerd uses the `http/protobuf` protocol
+</code></pre>
+<p><code>Runwasi</code> will automatically pick up the environment variables and start exporting traces to the specified endpoint.</p>
+<h3 id="jeager-exporter"><a class="header" href="#jeager-exporter">Jeager Exporter</a></h3>
+<p>You may use Jeager exporter to see the traces in the Jeager UI.</p>
+<pre><code class="language-sh">docker run -d -p16686:16686 -p4317:4317 -p4318:4318 -e COLLECTOR_OTLP_ENABLED=true jaegertracing/all-in-one:latest
+</code></pre>
+<p>You can access the Jeager UI at <code>http://localhost:16686</code>.</p>
+<h3 id="demo"><a class="header" href="#demo">Demo</a></h3>
+<p>Assuming you installed the <code>containerd-shim-wasmtime-v1</code> shim binary and the demo wasm image following README.md instructions,
+you can run the wasmtime shim with OpenTelemetry tracing by running the following command</p>
+<pre><code class="language-sh">sudo ctr run  --net-host --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm /wasi-demo-app.wasm sleep 3
+</code></pre>
+<p><img src="assets/wasmtime-shim-jeager.png" alt="A screenshot of the jeager UI for the wasmtime shim" /></p>
+<p><img src="assets/wasmtime-shim-tracing-main.png" alt="A screenshot of the jeager UI for traces of the main function call of the wasmtime shim" /></p>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
+<p><code>Runwasi</code> uses the standard <a href="https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/">OTLP environment variables</a> to configure the OTLP exporter endpoint. The following environment variables are supported:</p>
+<ul>
+<li><code>OTEL_EXPORTER_OTLP_ENDPOINT</code> - A base endpoint to send trace data to.</li>
+<li><code>OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</code> - The endpoint to send trace data to. Overrides <code>OTEL_EXPORTER_OTLP_ENDPOINT</code>.</li>
+<li><code>OTEL_EXPORTER_OTLP_PROTOCOL</code> - A base protocol to use when sending trace data. Default is <code>http/protobuf</code>. Valid values are <code>http/protobuf</code>, <code>grpc</code>.</li>
+<li><code>OTEL_EXPORTER_OTLP_TRACES_PROTOCOL</code> - The protocol to use when sending trace data. Overrides <code>OTEL_EXPORTER_OTLP_PROTOCOL</code>.</li>
+<li><code>OTEL_SDK_DISABLED</code> - Disables the SDK if set to <code>true</code>.</li>
+<li><code>OTEL_SERVICE_NAME</code> - The name of the service.</li>
+</ul>
+<h2 id="context-propagation"><a class="header" href="#context-propagation">Context Propagation</a></h2>
+<p><code>Runwasi</code> uses the <code>TRACECONTEXT</code> environment variable to propagate the trace context between the parent shim process and the child. The trace context is a W3C Trace Context header.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h1>
+<p>This guide helps you troubleshoot common issues with runwasi shims.</p>
+<h2 id="container-fails-to-start"><a class="header" href="#container-fails-to-start">Container Fails to Start</a></h2>
+<p>If your wasm container fails to start, you might see events like these:</p>
+<pre><code>Events:
+  Type     Reason                  Age               From               Message
+  ----     ------                  ----              ----               -------
+  Normal   Scheduled               18s               default-scheduler  Successfully assigned default/wasi-demo-75d6bb666c-479km to minikube
+  Warning  FailedCreatePodSandBox  4s (x2 over 18s)  kubelet            Failed to create pod sandbox: rpc error: code = Unknown desc = failed to get sandbox runtime: no runtime for "wasmtime" is configured
+</code></pre>
+<h4 id="investigation-steps"><a class="header" href="#investigation-steps">Investigation Steps:</a></h4>
+<ol>
+<li>
+<p><strong>Check runtime class configuration</strong>: Ensure your <code>RuntimeClass</code> is correctly configured.</p>
+<pre><code class="language-bash">kubectl get runtimeclass
+
+# Example output:
+ NAME                  HANDLER               AGE
+ wasm                  wasm                  8d
+ wasmedge              wasmedge              8d
+ wasmer                wasmer                8d
+ wasmtime              wasmtime              8d
+</code></pre>
+<blockquote>
+<p>RuntimeClass in Kubernetes defines a handler name (e.g., <code>wasmtime</code>) that maps directly to a CRI section in containerd’s config.toml (<code>[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.wasmtime]</code>), which then points to the shim binary (<code>containerd-shim-wasmtime-v1</code>) that executes your Wasm workload. See more details in <a href="https://github.com/containerd/containerd/blob/main/docs/cri/config.md#runtime-classes">Runtime classes from containerd</a></p>
+</blockquote>
+</li>
+<li>
+<p><strong>Check containerd configuration</strong>: Verify that the containerd configuration has a runtime configured for your Wasm shim (e.g., wasmtime).</p>
+<pre><code class="language-bash">cat /etc/containerd/config.toml
+
+# Look for a section like:
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.wasmtime]
+   runtime_type = "io.containerd.wasmtime.v1"
+</code></pre>
+</li>
+<li>
+<p>Make sure the containerd shim binary is in the PATH.</p>
+</li>
+</ol>
+<h2 id="log-based-troubleshooting"><a class="header" href="#log-based-troubleshooting">Log-Based Troubleshooting</a></h2>
+<p>Examining logs is one of the most effective ways to troubleshoot issues in runwasi shims.</p>
+<h3 id="finding-containerd-logs"><a class="header" href="#finding-containerd-logs">Finding containerd Logs</a></h3>
+<p>Logs can be in different locations depending on your system:</p>
+<h4 id="kubernetes-distributions"><a class="header" href="#kubernetes-distributions">Kubernetes Distributions</a></h4>
+<ul>
+<li>k3s: <code>/var/lib/rancher/k3s/agent/containerd/containerd.log</code></li>
+<li>k8s (kubeadm): <code>/var/log/containerd/containerd.log</code></li>
+</ul>
+<h4 id="using-journalctl-systemd-based-systems"><a class="header" href="#using-journalctl-systemd-based-systems">Using journalctl (systemd-based systems)</a></h4>
+<pre><code class="language-bash"># View all containerd logs
+journalctl -u containerd
+
+# Follow containerd logs
+journalctl -u containerd -f
+</code></pre>
+<h3 id="kubernetes-pod-logs"><a class="header" href="#kubernetes-pod-logs">Kubernetes Pod Logs</a></h3>
+<p>In addition to containerd logs, Kubernetes pod logs show the logs from your containers.</p>
+<pre><code class="language-bash">kubectl logs &lt;pod-name&gt;
+
+# Or stream logs in real-time
+kubectl logs -f &lt;pod-name&gt;
+</code></pre>
+<h3 id="using-structured-logging-with-container-and-pod-ids"><a class="header" href="#using-structured-logging-with-container-and-pod-ids">Using Structured Logging with Container and Pod IDs</a></h3>
+<p>runwasi shims include structured logging that automatically adds container ID and pod ID to log messages, making it easier to filter logs.</p>
+<h4 id="finding-container-id-and-pod-id"><a class="header" href="#finding-container-id-and-pod-id">Finding Container ID and Pod ID:</a></h4>
+<pre><code class="language-bash"># Get container IDs for a pod
+kubectl get pod &lt;pod-name&gt; -o jsonpath='{.status.containerStatuses[*].containerID}'
+# Output: containerd://&lt;container-id&gt;
+
+# Get pod ID for a specific pod
+crictl pods --name &lt;pod-name&gt; -q
+</code></pre>
+<p>Note: If you are using k3s, you can use the following command to get the pod ID:</p>
+<pre><code class="language-bash">k3s crictl pods --name &lt;pod-name&gt; -q
+</code></pre>
+<h4 id="filtering-logs-by-container-id-k3s"><a class="header" href="#filtering-logs-by-container-id-k3s">Filtering Logs by Container ID (k3s)</a></h4>
+<pre><code class="language-bash">grep 'instance="&lt;container-id&gt;"' /var/lib/rancher/k3s/agent/containerd/containerd.log
+
+# Example output:
+time="2025-03-05T21:49:01.527630395Z" level=info instance="820f78385e9c29cbd6a0b6767619286ffd7a3384959ce909063a22041d17c718" pod="22a0daacfeabe74d165552794ec9615c67545566bec282d3fe0b5cc910e9cdb5" msg="setting up wasi"
+</code></pre>
+<h4 id="filtering-logs-by-pod-id-k3s"><a class="header" href="#filtering-logs-by-pod-id-k3s">Filtering Logs by Pod ID (k3s)</a></h4>
+<pre><code class="language-bash">grep 'pod="22a0daacfeabe74d"' /var/lib/rancher/k3s/agent/containerd/containerd.log
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="frequently-asked-questions"><a class="header" href="#frequently-asked-questions">Frequently Asked Questions</a></h1>
+<p>This page answers common questions about Runwasi.</p>
+<p>[TODO]</p>
+<h3 id="where-can-i-get-help-if-i-have-more-questions"><a class="header" href="#where-can-i-get-help-if-i-have-more-questions">Where can I get help if I have more questions?</a></h3>
+<p>If you have more questions, you can:</p>
+<ul>
+<li>Join our <a href="https://cloud-native.slack.com/archives/C04LTPB6Z0V">Slack channel</a></li>
+<li>File an issue on <a href="https://github.com/containerd/runwasi/issues">GitHub</a></li>
+<li>Attend our community calls (see the <a href="resources/./community.html">Community page</a> for details)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="community-1"><a class="header" href="#community-1">Community</a></h1>
+<p>The Runwasi project thrives thanks to its community of contributors and users. We welcome participation from individuals and organizations interested in running WebAssembly workloads in container environments.</p>
+<h2 id="communication-channels"><a class="header" href="#communication-channels">Communication Channels</a></h2>
+<h3 id="slack"><a class="header" href="#slack">Slack</a></h3>
+<ul>
+<li>If you haven’t joined the CNCF Slack yet, you can do so <a href="https://slack.cncf.io/">here</a>.</li>
+<li>Come join us on our <a href="https://cloud-native.slack.com/archives/C04LTPB6Z0V">#runwasi</a> channel on the CNCF Slack.</li>
+</ul>
+<h3 id="community-calls"><a class="header" href="#community-calls">Community Calls</a></h3>
+<p>We hold regular community calls to discuss project updates, upcoming features, and address questions:</p>
+<ul>
+<li><strong>Schedule</strong>: Tuesdays every other week at 9:00 AM PT</li>
+<li><strong>Zoom Link</strong>: <a href="https://zoom.us/my/containerd?pwd=bENmREpnSGRNRXdBZWV5UG8wbU1oUT09">Zoom Meeting</a></li>
+<li><strong>Meeting Notes</strong>: <a href="https://docs.google.com/document/d/1aOJ-O7fgMyRowHD0kOoA2Z_4d19NyAvvdqOkZO3Su_M/edit?usp=sharing">Google Doc</a></li>
+</ul>
+<p>These calls are open to everyone interested in the project, regardless of experience level.</p>
+<h2 id="getting-help"><a class="header" href="#getting-help">Getting Help</a></h2>
+<p>If you need help with Runwasi, there are several ways to get assistance:</p>
+<ol>
+<li><strong>Slack</strong>: Ask questions in the <a href="https://cloud-native.slack.com/archives/C04LTPB6Z0V">#runwasi</a> channel</li>
+<li><strong>GitHub Issues</strong>: <a href="https://github.com/containerd/runwasi/issues">File an issue</a> for bugs or feature requests</li>
+<li><strong>Community Calls</strong>: Join our biweekly calls to discuss with the maintainers</li>
+<li><strong>Documentation</strong>: Browse our <a href="resources/../">documentation</a> for guides and references</li>
+</ol>
+<h2 id="contributing-2"><a class="header" href="#contributing-2">Contributing</a></h2>
+<p>We welcome contributions of all kinds! Whether you’re fixing a typo, improving documentation, adding a feature, or reporting a bug, your help is appreciated.</p>
+<p>See our <a href="https://runwasi.dev/CONTRIBUTING.html">Contributing Guide</a> for detailed information.</p>
+<h2 id="projects-using-runwasi-1"><a class="header" href="#projects-using-runwasi-1">Projects Using Runwasi</a></h2>
+<p>Runwasi is being used by several projects in the WebAssembly and container ecosystems:</p>
+<ul>
+<li><a href="https://github.com/spinkube/containerd-shim-spin">spinkube/containerd-shim-spin</a></li>
+<li><a href="https://github.com/deislabs/containerd-wasm-shims">deislabs/containerd-wasm-shims</a></li>
+</ul>
+<p>If you’re using Runwasi in your project, we’d love to hear about it! Let us know on Slack or during a community call.</p>
+<h2 id="code-of-conduct"><a class="header" href="#code-of-conduct">Code of Conduct</a></h2>
+<p>Runwasi follows the <a href="https://github.com/cncf/foundation/blob/main/code-of-conduct.md">CNCF Code of Conduct</a>. We are committed to providing a welcoming and inclusive environment for all participants.</p>
+<h2 id="roadmap-and-future-direction"><a class="header" href="#roadmap-and-future-direction">Roadmap and Future Direction</a></h2>
+<p>To learn about our current development focus and future plans, check out our <a href="resources/../developer/roadmap.html">Roadmap</a>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

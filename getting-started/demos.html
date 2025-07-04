@@ -1,0 +1,307 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Demos - Runwasi Developer Documentation</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Documentation for runwasi">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Runwasi Developer Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/containerd/runwasi" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/containerd/runwasi/edit/main/docs/src/getting-started/demos.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="demos"><a class="header" href="#demos">Demos</a></h1>
+<p>This page provides various demonstrations of running WebAssembly workloads with Runwasi.</p>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<p>Before running these demos, make sure you have:</p>
+<ol>
+<li>Installed the Runwasi shims as described in the <a href="./installation.html">Installation Guide</a></li>
+<li>Installed containerd and its CLI tool <code>ctr</code></li>
+</ol>
+<h2 id="demo-1-using-container-image-with-wasm-module"><a class="header" href="#demo-1-using-container-image-with-wasm-module">Demo 1: Using Container Image with Wasm Module</a></h2>
+<p>This demo runs a WebAssembly module from a regular OCI container image that contains the Wasm module in its filesystem.</p>
+<h3 id="setup"><a class="header" href="#setup">Setup</a></h3>
+<p>Pull the test image:</p>
+<pre><code class="language-bash">make pull-app
+# or
+sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-app:latest
+</code></pre>
+<h3 id="running-the-demo"><a class="header" href="#running-the-demo">Running the Demo</a></h3>
+<p>Run the image with your preferred runtime:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<p>You can also specify a particular command:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm /wasi-demo-app.wasm echo 'hello'
+</code></pre>
+<p>The output should look like:</p>
+<pre><code>This is a song that never ends.
+Yes, it goes on and on my friends.
+Some people started singing it not knowing what it was,
+So they'll continue singing it forever just because...
+</code></pre>
+<p>To kill the process, run in another terminal:</p>
+<pre><code class="language-bash">sudo ctr task kill -s SIGKILL testwasm
+</code></pre>
+<p>The test binary supports various commands for different types of functionality. Check <a href="https://github.com/containerd/runwasi/blob/main/crates/wasi-demo-app/src/main.rs">crates/wasi-demo-app/src/main.rs</a> to explore more options.</p>
+<h2 id="demo-2-using-oci-images-with-custom-wasm-layers"><a class="header" href="#demo-2-using-oci-images-with-custom-wasm-layers">Demo 2: Using OCI Images with Custom WASM Layers</a></h2>
+<p>This demo showcases a more advanced approach using OCI Images with custom WASM layers. This approach doesn’t include the Wasm module in the container’s filesystem but instead stores it as a separate layer in the OCI image. This provides better cross-platform support and de-duplication in the Containerd content store.</p>
+<blockquote>
+<p><strong>Note</strong>: This requires containerd 2.0+, 1.7.7+ or 1.6.25+. If you don’t have these patches for both <code>containerd</code> and <code>ctr</code>, you’ll encounter an error message like <code>mismatched image rootfs and manifest layers</code>. Latest versions of k3s and kind have the necessary containerd versions.</p>
+</blockquote>
+<h3 id="setup-1"><a class="header" href="#setup-1">Setup</a></h3>
+<p>Pull the OCI image with WASM layers:</p>
+<pre><code class="language-bash">make pull
+# or
+sudo ctr images pull ghcr.io/containerd/runwasi/wasi-demo-oci:latest
+</code></pre>
+<h3 id="running-the-demo-1"><a class="header" href="#running-the-demo-1">Running the Demo</a></h3>
+<p>Run the image with your preferred runtime:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmtime.v1 ghcr.io/containerd/runwasi/wasi-demo-oci:latest testwasmoci wasi-demo-oci.wasm echo 'hello'
+</code></pre>
+<p>Expected output:</p>
+<pre><code>hello
+exiting
+</code></pre>
+<p>To learn more about this approach, check the <a href="https://docs.google.com/document/d/11shgC3l6gplBjWF1VJCWvN_9do51otscAm0hBDGSSAc/edit">design document</a>.</p>
+<h2 id="demo-3-using-wasm-oci-artifact"><a class="header" href="#demo-3-using-wasm-oci-artifact">Demo 3: Using Wasm OCI Artifact</a></h2>
+<p>The <a href="https://tag-runtime.cncf.io/wgs/wasm/charter/">CNCF tag-runtime wasm working group</a> has defined an <a href="https://tag-runtime.cncf.io/wgs/wasm/deliverables/wasm-oci-artifact/">OCI Artifact format for Wasm</a>. This new artifact type enables usage across projects beyond just Runwasi.</p>
+<pre><code class="language-bash">make test/k8s-oci-wasmtime
+</code></pre>
+<blockquote>
+<p>Note: We use a Kubernetes cluster to run this demo since containerd’s ctr has a bug that results in: <code>unknown image config media type application/vnd.wasm.config.v0+json</code></p>
+</blockquote>
+<h2 id="wasihttp-demo-for-wasmtime-shim"><a class="header" href="#wasihttp-demo-for-wasmtime-shim">WASI/HTTP Demo for Wasmtime Shim</a></h2>
+<p>The <code>wasmtime-shim</code> includes support for the WASI/HTTP specification. For details on running HTTP-based WebAssembly modules, see the <a href="https://github.com/containerd/runwasi/blob/main/crates/containerd-shim-wasmtime/README.md#WASI/HTTP">wasmtime-shim documentation</a>.</p>
+<h2 id="using-different-webassembly-runtimes"><a class="header" href="#using-different-webassembly-runtimes">Using Different WebAssembly Runtimes</a></h2>
+<p>All demos can be run using any of the available Runwasi shims by replacing <code>wasmtime</code> with the runtime of your choice:</p>
+<ul>
+<li><strong>Wasmtime</strong>: <code>io.containerd.wasmtime.v1</code></li>
+<li><strong>WasmEdge</strong>: <code>io.containerd.wasmedge.v1</code></li>
+<li><strong>Wasmer</strong>: <code>io.containerd.wasmer.v1</code></li>
+<li><strong>WAMR</strong>: <code>io.containerd.wamr.v1</code></li>
+</ul>
+<p>For example:</p>
+<pre><code class="language-bash">sudo ctr run --rm --runtime=io.containerd.wasmedge.v1 ghcr.io/containerd/runwasi/wasi-demo-app:latest testwasm
+</code></pre>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li>Explore running WebAssembly workloads on Kubernetes in the <a href="./quickstart.html">Quickstart with Kubernetes</a> guide</li>
+<li>Learn about the <a href="../developer/architecture.html">Architecture</a> of Runwasi</li>
+<li>Check out <a href="../CONTRIBUTING.html">Contributing</a> to get involved with the project</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../getting-started/installation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../getting-started/quickstart.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../getting-started/installation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../getting-started/quickstart.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>
