@@ -1,23 +1,33 @@
 use anyhow::Result;
-use containerd_shim_wasm::container::{Engine, Entrypoint, Instance, RuntimeContext};
+use containerd_shim_wasm::sandbox::Sandbox;
+use containerd_shim_wasm::sandbox::context::{Entrypoint, RuntimeContext};
+use containerd_shim_wasm::shim::{Shim, Version, version};
 use tokio::runtime::Handle;
 use wasmer::{Module, Store};
 use wasmer_wasix::virtual_fs::host_fs::FileSystem;
 use wasmer_wasix::{WasiEnv, WasiError};
 
-pub type WasmerInstance = Instance<WasmerEngine>;
+pub struct WasmerShim;
 
-#[derive(Clone, Default)]
-pub struct WasmerEngine {
+#[derive(Default)]
+pub struct WasmerSandbox {
     engine: wasmer::Cranelift,
 }
 
-impl Engine for WasmerEngine {
+impl Shim for WasmerShim {
     fn name() -> &'static str {
         "wasmer"
     }
 
-    fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
+    fn version() -> Version {
+        version!()
+    }
+
+    type Sandbox = WasmerSandbox;
+}
+
+impl Sandbox for WasmerSandbox {
+    async fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
         let args = ctx.args();
         let envs = ctx
             .envs()
@@ -36,18 +46,13 @@ impl Engine for WasmerEngine {
 
         let mod_name = name.unwrap_or_else(|| "main".to_string());
 
-        containerd_shim_wasm::info!(ctx, "Create a Store");
+        log::info!("Create a Store");
         let mut store = Store::new(self.engine.clone());
 
         let wasm_bytes = source.as_bytes()?;
         let module = Module::from_binary(&store, &wasm_bytes)?;
 
-        let runtime = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .build()?;
-        let _guard = runtime.enter();
-
-        containerd_shim_wasm::info!(ctx, "Creating `WasiEnv`...: args {args:?}, envs: {envs:?}");
+        log::info!("Creating `WasiEnv`...: args {args:?}, envs: {envs:?}");
         let fs = FileSystem::new(Handle::current(), "/")?;
         let (instance, wasi_env) = WasiEnv::builder(mod_name)
             .args(&args[1..])
@@ -56,14 +61,16 @@ impl Engine for WasmerEngine {
             .preopen_dir("/")?
             .instantiate(module, &mut store)?;
 
-        containerd_shim_wasm::info!(ctx, "Running {func:?}");
+        log::info!("Running {func:?}");
         let start = instance.exports.get_function(&func)?;
         wasi_env.data(&store).thread.set_status_running();
-        let status = start.call(&mut store, &[]).map(|_| 0).or_else(|err| {
-            match err.downcast_ref::<WasiError>() {
-                Some(WasiError::Exit(code)) => Ok(code.raw()),
-                _ => Err(err),
-            }
+        let status = tokio::task::block_in_place(|| {
+            start.call(&mut store, &[]).map(|_| 0).or_else(|err| {
+                match err.downcast_ref::<WasiError>() {
+                    Some(WasiError::Exit(code)) => Ok(code.raw()),
+                    _ => Err(err),
+                }
+            })
         })?;
 
         Ok(status)

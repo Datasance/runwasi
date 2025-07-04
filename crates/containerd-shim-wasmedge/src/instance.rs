@@ -5,7 +5,9 @@ use std::str::FromStr;
 
 use anyhow::{Context, Result};
 use cfg_if::cfg_if;
-use containerd_shim_wasm::container::{Engine, Entrypoint, Instance, RuntimeContext};
+use containerd_shim_wasm::sandbox::Sandbox;
+use containerd_shim_wasm::sandbox::context::{Entrypoint, RuntimeContext};
+use containerd_shim_wasm::shim::{Shim, Version, version};
 #[cfg(all(feature = "plugin", not(target_env = "musl")))]
 use wasmedge_sdk::AsInstance;
 use wasmedge_sdk::config::{CommonConfigOptions, Config, ConfigBuilder};
@@ -16,14 +18,13 @@ use wasmedge_sdk::plugin::PluginManager;
 use wasmedge_sdk::wasi::WasiModule;
 use wasmedge_sdk::{Module, Store, Vm};
 
-pub type WasmEdgeInstance = Instance<WasmEdgeEngine>;
+pub struct WasmEdgeShim;
 
-#[derive(Clone)]
-pub struct WasmEdgeEngine {
+pub struct WasmEdgeSandbox {
     config: Config,
 }
 
-impl Default for WasmEdgeEngine {
+impl Default for WasmEdgeSandbox {
     fn default() -> Self {
         let config = ConfigBuilder::new(CommonConfigOptions::default())
             .build()
@@ -32,12 +33,20 @@ impl Default for WasmEdgeEngine {
     }
 }
 
-impl Engine for WasmEdgeEngine {
+impl Shim for WasmEdgeShim {
     fn name() -> &'static str {
         "wasmedge"
     }
 
-    fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
+    fn version() -> Version {
+        version!()
+    }
+
+    type Sandbox = WasmEdgeSandbox;
+}
+
+impl Sandbox for WasmEdgeSandbox {
+    async fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
         let args = ctx.args();
         let envs = ctx.envs();
         let Entrypoint {
@@ -47,7 +56,7 @@ impl Engine for WasmEdgeEngine {
             name,
         } = ctx.entrypoint();
 
-        containerd_shim_wasm::debug!(ctx, "initializing WasmEdge runtime");
+        log::debug!("initializing WasmEdge runtime");
 
         let prefix = "WASMEDGE_";
         for env in envs.iter().filter(|env| env.starts_with(prefix)) {
@@ -95,7 +104,7 @@ impl Engine for WasmEdgeEngine {
             .register_module(Some(&mod_name), module)
             .context("registering module")?;
 
-        containerd_shim_wasm::debug!(ctx, "running with method {func:?}");
+        log::debug!("running with method {func:?}");
         vm.run_func(Some(&mod_name), func, vec![])?;
 
         Ok(wasi_module.exit_code() as i32)

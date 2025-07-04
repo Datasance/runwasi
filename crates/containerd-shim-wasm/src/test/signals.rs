@@ -28,49 +28,50 @@ use std::time::Duration;
 
 use anyhow::{Result, bail};
 use containerd_shim_wasm_test_modules::HELLO_WORLD;
+use tokio::time::sleep as async_sleep;
 
-use crate::container::{Engine, Instance, RuntimeContext};
+use crate::sandbox::Sandbox;
+use crate::sandbox::context::RuntimeContext;
+use crate::shim::Shim;
 use crate::testing::WasiTest;
 
-#[derive(Clone, Default)]
 pub struct SomeEngine;
 
-impl Engine for SomeEngine {
+#[derive(Default)]
+pub struct SomeContainer;
+
+impl Shim for SomeEngine {
     fn name() -> &'static str {
         "some-engine"
     }
 
-    fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
+    type Sandbox = SomeContainer;
+}
+
+impl Sandbox for SomeContainer {
+    async fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
         let name = ctx.entrypoint().func;
-        tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()?
-            .block_on(async move {
-                use tokio::time::sleep;
-                let signal = async {
-                    println!("{name}> waiting for signal!");
-                    let _ = tokio::signal::ctrl_c().await;
-                    println!("{name}> received signal, bye!");
-                };
-                let task = async {
-                    sleep(Duration::from_millis(10)).await;
-                    // use writeln to avoid output capturing from the
-                    // testing framework
-                    let _ = writeln!(stderr(), "{name}> ready");
-                    pending().await
-                };
-                tokio::select! {
-                    _ = signal => {}
-                    _ = task => {}
-                };
-                Ok(0)
-            })
+        let signal = async {
+            println!("{name}> waiting for signal!");
+            let _ = tokio::signal::ctrl_c().await;
+            println!("{name}> received signal, bye!");
+        };
+        let task = async {
+            async_sleep(Duration::from_millis(10)).await;
+            // use writeln to avoid output capturing from the
+            // testing framework
+            let _ = writeln!(stderr(), "{name}> ready");
+            pending().await
+        };
+        tokio::select! {
+            _ = signal => {}
+            _ = task => {}
+        };
+        Ok(0)
     }
 }
 
-type SomeInstance = Instance<SomeEngine>;
-
-struct KillGuard(Arc<WasiTest<SomeInstance>>);
+struct KillGuard(Arc<WasiTest<SomeEngine>>);
 impl Drop for KillGuard {
     fn drop(&mut self) {
         let _ = self.0.kill();
@@ -79,14 +80,14 @@ impl Drop for KillGuard {
 
 #[test]
 fn test_handling_signals() -> Result<()> {
-    zygote::Zygote::global();
+    containerd_shimkit::zygote::Zygote::global();
 
     // use a thread scope to ensure we join all threads at the end
     std::thread::scope(|s| -> Result<()> {
         let mut containers = vec![];
 
         for i in 0..20 {
-            let builder = WasiTest::<SomeInstance>::builder()?
+            let builder = WasiTest::<SomeEngine>::builder()?
                 .with_name(format!("test-{i}"))
                 .with_start_fn(format!("test-{i}"))
                 .with_wasm(HELLO_WORLD)?;

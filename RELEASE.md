@@ -36,8 +36,9 @@ gh workflow run release.yml -f dry_run=true -f crate=containerd-shim-wasm -f ver
 ### Crate Release Sequence
 
 Must release the creates in this order due to dependencies:
-1. `containerd-shim-wasm`
-2. All runtime-related crates.
+1. `containerd-shimkit`
+2. `containerd-shim-wasm`
+3. All runtime-related crates.
 
 ### Release Steps
 
@@ -78,7 +79,9 @@ In the Github release page, please provide the above command in the instructions
 ### First time release of a crate
 
 If the crate has never been published to crates.io before then ownership of the crate will need to be configured.
-The containerd/runwasi-committers team will need to be added as an owner of the crate.
+1. You should pass `initial_release=true` to the release workflow to skip the ownership step.
+2. The containerd/runwasi-committers team will need to be added as an owner of the crate.
+
 The release workflow will automatically invite the person who triggered the workflow run to be an owner of the crate.
 That person will need to accept the invite to be an owner of the crate and then manually add the containerd/runwasi-committers team as an owner of the crate.
 

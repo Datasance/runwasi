@@ -1,7 +1,7 @@
 mod http_proxy;
 pub mod instance;
 
-pub use instance::WasmtimeInstance;
+pub use instance::WasmtimeShim;
 
 #[cfg(unix)]
 #[cfg(test)]

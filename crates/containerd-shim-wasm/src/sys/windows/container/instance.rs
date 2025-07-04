@@ -1,14 +1,15 @@
 use std::marker::PhantomData;
-use std::time::Duration;
 
 use chrono::{DateTime, Utc};
+use containerd_shimkit::sandbox::{
+    Error as SandboxError, Instance as SandboxInstance, InstanceConfig,
+};
 
-use crate::container::Engine;
-use crate::sandbox::{Error as SandboxError, Instance as SandboxInstance, InstanceConfig};
+use crate::shim::Shim;
 
-pub struct Instance<E: Engine>(PhantomData<E>);
+pub struct Instance<S: Shim>(PhantomData<S>);
 
-impl<E: Engine> SandboxInstance for Instance<E> {
+impl<S: Shim> SandboxInstance for Instance<S> {
     async fn new(_id: String, _cfg: &InstanceConfig) -> Result<Self, SandboxError> {
         todo!();
     }

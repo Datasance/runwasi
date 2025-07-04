@@ -2,7 +2,7 @@
 pub mod instance;
 
 #[cfg(unix)]
-pub use instance::WamrInstance;
+pub use instance::WamrShim;
 
 #[cfg(unix)]
 #[cfg(test)]

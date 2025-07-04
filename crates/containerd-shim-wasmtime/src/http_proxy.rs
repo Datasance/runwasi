@@ -8,7 +8,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
 use anyhow::{Result, bail};
-use containerd_shim_wasm::container::RuntimeContext;
+use containerd_shim_wasm::sandbox::context::RuntimeContext;
 use hyper::server::conn::http1;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_util::sync::CancellationToken;
@@ -100,7 +100,7 @@ pub(crate) async fn serve_conn(
     let listener = socket.listen(backlog)?;
     let tracker = TaskTracker::new();
 
-    containerd_shim_wasm::info!(ctx, "Serving HTTP on http://{}/", listener.local_addr()?);
+    log::info!("Serving HTTP on http://{}/", listener.local_addr()?);
 
     let env = env.into_iter().collect();
     let handler = Arc::new(ProxyHandler::new(instance, env, tracker.clone()));
@@ -164,7 +164,7 @@ impl ProxyHandler {
 
     fn wasi_store_for_request(&self, req_id: u64) -> Store<WasiPreview2Ctx> {
         let engine = self.instance_pre.engine();
-        let mut builder = wasmtime_wasi::WasiCtxBuilder::new();
+        let mut builder = wasmtime_wasi::p2::WasiCtxBuilder::new();
 
         builder.envs(&self.env);
         builder.env("REQUEST_ID", req_id.to_string());

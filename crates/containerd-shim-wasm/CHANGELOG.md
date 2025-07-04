@@ -4,6 +4,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [v1.0.0]
+
+### Changed
+- `containerd_shim_wasm::sandbox::shim::Cli` -> `containerd_shim_wasm::sandbox::shim::Shim` and it is no longer public, because this was not intended to be used by users of the crate.
+- Breaking change: All methods in the `Engine` trait (except `name` and `supported_layers_types`) are now async. ([#931](https://github.com/containerd/runwasi/pull/931))
+- The `Engine` trait is now being split into `Shim`, `Sandbox` and `Compiler` traits. ([#936](https://github.com/containerd/runwasi/pull/936))
+- The `container` module is renamed to `shim` module. ([#936](https://github.com/containerd/runwasi/pull/936))
+- The `Instance` trait is moved to the `containerd_shimkit` crate, which has it's own changelog, version and README. ([#930](https://github.com/containerd/runwasi/pull/930))
+- Reorganized types, traits and macros in more meaningful modules. ([#957](https://github.com/containerd/runwasi/pull/957))
+- `Config` is now locally defined instead of re-exported, and doesn't expose the `no_reaper` or `no_sub_reaper` options. ([#957](https://github.com/containerd/runwasi/pull/957))
+
+### Removed
+- Removed the `shim_main` function. Use `ShimCli::run` trait method instead. ([#944](https://github.com/containerd/runwasi/pull/944) and [#943](https://github.com/containerd/runwasi/pull/943))
+- The `with_lease` macro, `otel` module and `instance_utils` module are now private. ([#929](https://github.com/containerd/runwasi/pull/929))
+- The logging macros are removed. Now, the pod ID and container ID are unconditionally added to any logging coming from a sandbox process. ([#953](https://github.com/containerd/runwasi/pull/953)
+- Removed from `RuntimeContext` the methods: `platform`, `pod_id`, and `container_id`. ([#971](https://github.com/containerd/runwasi/pull/971))
+
 ## [v0.10.0] - 2025-03-05
 
 ### Added
@@ -95,7 +112,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Removed dependency on `prost-types` ([#656](https://github.com/containerd/runwasi/pull/656))
 - Removed dependency on `native-tls` ([#683](https://github.com/containerd/runwasi/pull/683)), note that the `opentelemetry` feature still depends on `native-tls`.
 
-[Unreleased]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v0.10.0..HEAD>
+[Unreleased]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v1.0.0..HEAD>
+[v1.0.0]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v0.10.0...containerd-shim-wasm/v1.0.0>
 [v0.10.0]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v0.9.0...containerd-shim-wasm/v0.10.0>
 [v0.9.0]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v0.8.0...containerd-shim-wasm/v0.9.0>
 [v0.8.0]: <https://github.com/containerd/runwasi/compare/containerd-shim-wasm/v0.7.0...containerd-shim-wasm/v0.8.0>

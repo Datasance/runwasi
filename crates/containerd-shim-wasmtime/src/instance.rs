@@ -1,26 +1,24 @@
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::sync::LazyLock;
 
 use anyhow::{Context, Result, bail};
-use containerd_shim_wasm::container::{
-    Engine, Entrypoint, Instance, RuntimeContext, WasmBinaryType,
+use containerd_shim_wasm::sandbox::Sandbox;
+use containerd_shim_wasm::sandbox::context::{
+    Entrypoint, RuntimeContext, WasmBinaryType, WasmLayer,
 };
-use containerd_shim_wasm::sandbox::WasmLayer;
+use containerd_shim_wasm::shim::{Compiler, Shim, Version, version};
 use tokio_util::sync::CancellationToken;
 use wasi_preview1::WasiP1Ctx;
 use wasi_preview2::bindings::Command;
 use wasmtime::component::types::ComponentItem;
 use wasmtime::component::{self, Component, ResourceTable};
 use wasmtime::{Config, Module, Precompiled, Store};
+use wasmtime_wasi::p2::{self as wasi_preview2};
 use wasmtime_wasi::preview1::{self as wasi_preview1};
-use wasmtime_wasi::{self as wasi_preview2};
 use wasmtime_wasi_http::bindings::ProxyPre;
 use wasmtime_wasi_http::{WasiHttpCtx, WasiHttpView};
 
 use crate::http_proxy::serve_conn;
-
-pub type WasmtimeInstance = Instance<WasmtimeEngine>;
 
 /// Represents the WASI API that the component is targeting.
 enum ComponentTarget<'a> {
@@ -53,28 +51,16 @@ impl<'a> ComponentTarget<'a> {
     }
 }
 
-#[derive(Clone, Default, Debug)]
-pub struct WasmtimeEngine;
+pub struct WasmtimeShim;
 
-static PRECOMPILER: LazyLock<wasmtime::Engine> = LazyLock::new(|| {
-    let mut config = wasmtime::Config::new();
+pub struct WasmtimeCompiler(wasmtime::Engine);
 
-    // Disable Wasmtime parallel compilation for the tests
-    // see https://github.com/containerd/runwasi/pull/405#issuecomment-1928468714 for details
-    config.parallel_compilation(!cfg!(test));
-    config.wasm_component_model(true); // enable component linking
-    config.async_support(true); // must be on
-
-    wasmtime::Engine::new(&config).expect("failed to create wasmtime precompilation engine")
-});
-
-#[derive(Clone)]
-pub struct WasmtimeEngineImpl {
+pub struct WasmtimeSandbox {
     engine: wasmtime::Engine,
     cancel: CancellationToken,
 }
 
-impl Default for WasmtimeEngineImpl {
+impl Default for WasmtimeSandbox {
     fn default() -> Self {
         let mut config = wasmtime::Config::new();
 
@@ -106,7 +92,7 @@ pub struct WasiPreview2Ctx {
 
 impl WasiPreview2Ctx {
     pub fn new(ctx: &impl RuntimeContext) -> Result<Self> {
-        containerd_shim_wasm::debug!(ctx, "Creating new WasiPreview2Ctx");
+        log::debug!("Creating new WasiPreview2Ctx");
         Ok(Self {
             wasi_ctx: wasi_builder(ctx)?.build(),
             wasi_http: WasiHttpCtx::new(),
@@ -117,32 +103,55 @@ impl WasiPreview2Ctx {
 
 /// This impl is required to use wasmtime_wasi::preview2::WasiView trait.
 impl wasi_preview2::WasiView for WasiPreview2Ctx {
-    fn table(&mut self) -> &mut ResourceTable {
-        &mut self.resource_table
-    }
-
     fn ctx(&mut self) -> &mut wasi_preview2::WasiCtx {
         &mut self.wasi_ctx
     }
 }
 
-impl WasiHttpView for WasiPreview2Ctx {
-    fn table(&mut self) -> &mut wasmtime::component::ResourceTable {
+impl wasi_preview2::IoView for WasiPreview2Ctx {
+    fn table(&mut self) -> &mut ResourceTable {
         &mut self.resource_table
     }
+}
 
+impl WasiHttpView for WasiPreview2Ctx {
     fn ctx(&mut self) -> &mut wasmtime_wasi_http::WasiHttpCtx {
         &mut self.wasi_http
     }
 }
 
-impl Engine for WasmtimeEngine {
+impl Shim for WasmtimeShim {
     fn name() -> &'static str {
         "wasmtime"
     }
 
-    fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
-        containerd_shim_wasm::info!(ctx, "setting up wasi");
+    fn version() -> Version {
+        version!()
+    }
+
+    type Sandbox = WasmtimeSandbox;
+
+    #[allow(refining_impl_trait)]
+    async fn compiler() -> Option<WasmtimeCompiler> {
+        let mut config = wasmtime::Config::new();
+
+        // Disable Wasmtime parallel compilation for the tests
+        // see https://github.com/containerd/runwasi/pull/405#issuecomment-1928468714 for details
+        config.parallel_compilation(!cfg!(test));
+        config.wasm_component_model(true); // enable component linking
+        config.async_support(true); // must be on
+
+        let engine = wasmtime::Engine::new(&config)
+            .expect("failed to create wasmtime precompilation engine");
+
+        Some(WasmtimeCompiler(engine))
+    }
+}
+
+impl Sandbox for WasmtimeSandbox {
+    async fn run_wasi(&self, ctx: &impl RuntimeContext) -> Result<i32> {
+        log::info!("setting up wasi");
+
         let Entrypoint {
             source,
             func,
@@ -151,26 +160,29 @@ impl Engine for WasmtimeEngine {
         } = ctx.entrypoint();
 
         let wasm_bytes = &source.as_bytes()?;
-        WasmtimeEngineImpl::default()
-            .execute(ctx, wasm_bytes, func)
-            .into_error_code()
+
+        self.execute(ctx, wasm_bytes, func).await.into_error_code()
+    }
+}
+
+impl Compiler for WasmtimeCompiler {
+    fn cache_key(&self) -> impl Hash {
+        self.0.precompile_compatibility_hash()
     }
 
-    fn precompile(&self, layers: &[WasmLayer]) -> Result<Vec<Option<Vec<u8>>>> {
+    async fn compile(&self, layers: &[WasmLayer]) -> Result<Vec<Option<Vec<u8>>>> {
         let mut compiled_layers = Vec::<Option<Vec<u8>>>::with_capacity(layers.len());
 
         for layer in layers {
-            if PRECOMPILER.detect_precompiled(&layer.layer).is_some() {
+            if wasmtime::Engine::detect_precompiled(&layer.layer).is_some() {
                 log::info!("Already precompiled");
                 compiled_layers.push(None);
                 continue;
             }
 
-            use WasmBinaryType::*;
-
             let compiled_layer = match WasmBinaryType::from_bytes(&layer.layer) {
-                Some(Module) => PRECOMPILER.precompile_module(&layer.layer)?,
-                Some(Component) => PRECOMPILER.precompile_component(&layer.layer)?,
+                Some(WasmBinaryType::Module) => self.0.precompile_module(&layer.layer)?,
+                Some(WasmBinaryType::Component) => self.0.precompile_component(&layer.layer)?,
                 None => {
                     log::warn!("Unknown WASM binary type");
                     continue;
@@ -182,55 +194,45 @@ impl Engine for WasmtimeEngine {
 
         Ok(compiled_layers)
     }
-
-    fn can_precompile(&self) -> Option<String> {
-        let mut hasher = DefaultHasher::new();
-        PRECOMPILER
-            .precompile_compatibility_hash()
-            .hash(&mut hasher);
-        Some(hasher.finish().to_string())
-    }
 }
 
-impl WasmtimeEngineImpl {
+impl WasmtimeSandbox {
     /// Execute a wasm module.
     ///
     /// This function adds wasi_preview1 to the linker and can be utilized
     /// to execute a wasm module that uses wasi_preview1.
-    fn execute_module(
+    async fn execute_module(
         &self,
         ctx: &impl RuntimeContext,
         module: Module,
         func: &String,
     ) -> Result<i32> {
-        containerd_shim_wasm::debug!(ctx, "execute module");
+        log::debug!("execute module");
 
         let ctx_p1 = wasi_builder(ctx)?.build_p1();
         let mut store = Store::new(&self.engine, ctx_p1);
         let mut module_linker = wasmtime::Linker::new(&self.engine);
 
-        containerd_shim_wasm::debug!(ctx, "init linker");
+        log::debug!("init linker");
         wasi_preview1::add_to_linker_async(&mut module_linker, |wasi_ctx: &mut WasiP1Ctx| {
             wasi_ctx
         })?;
 
-        wasmtime_wasi::runtime::in_tokio(async move {
-            containerd_shim_wasm::info!(ctx, "instantiating instance");
-            let instance: wasmtime::Instance =
-                module_linker.instantiate_async(&mut store, &module).await?;
+        log::info!("instantiating instance");
+        let instance: wasmtime::Instance =
+            module_linker.instantiate_async(&mut store, &module).await?;
 
-            containerd_shim_wasm::debug!(ctx, "getting start function");
-            let start_func = instance
-                .get_func(&mut store, func)
-                .context("module does not have a WASI start function")?;
+        log::debug!("getting start function");
+        let start_func = instance
+            .get_func(&mut store, func)
+            .context("module does not have a WASI start function")?;
 
-            containerd_shim_wasm::info!(ctx, "running start function {func:?}");
+        log::info!("running start function {func:?}");
 
-            start_func
-                .call_async(&mut store, &[], &mut [])
-                .await
-                .into_error_code()
-        })
+        start_func
+            .call_async(&mut store, &[], &mut [])
+            .await
+            .into_error_code()
     }
 
     async fn execute_component_async(
@@ -239,7 +241,7 @@ impl WasmtimeEngineImpl {
         component: Component,
         func: String,
     ) -> Result<i32> {
-        containerd_shim_wasm::info!(ctx, "instantiating component");
+        log::info!("instantiating component");
 
         let target = ComponentTarget::new(
             component.component_type().exports(&self.engine),
@@ -249,21 +251,21 @@ impl WasmtimeEngineImpl {
         // This is a adapter logic that converts wasip1 `_start` function to wasip2 `run` function.
         let status = match target {
             ComponentTarget::HttpProxy => {
-                containerd_shim_wasm::info!(ctx, "Found HTTP proxy target");
+                log::info!("Found HTTP proxy target");
                 let mut linker = component::Linker::new(&self.engine);
-                wasmtime_wasi::add_to_linker_async(&mut linker)?;
+                wasmtime_wasi::p2::add_to_linker_async(&mut linker)?;
                 wasmtime_wasi_http::add_only_http_to_linker_async(&mut linker)?;
 
                 let pre = linker.instantiate_pre(&component)?;
-                containerd_shim_wasm::info!(ctx, "pre-instantiate_pre");
+                log::info!("pre-instantiate_pre");
                 let instance = ProxyPre::new(pre)?;
 
-                containerd_shim_wasm::info!(ctx, "starting HTTP server");
+                log::info!("starting HTTP server");
                 let cancel = self.cancel.clone();
                 serve_conn(ctx, instance, cancel).await
             }
             ComponentTarget::Command => {
-                containerd_shim_wasm::info!(ctx, "Found command target");
+                log::info!("Found command target");
                 let wasi_ctx = WasiPreview2Ctx::new(ctx)?;
                 let (mut store, linker) = store_for_context(&self.engine, wasi_ctx)?;
 
@@ -280,22 +282,19 @@ impl WasmtimeEngineImpl {
                     })
             }
             ComponentTarget::Core(func) => {
-                containerd_shim_wasm::info!(ctx, "Found Core target");
+                log::info!("Found Core target");
                 let wasi_ctx = WasiPreview2Ctx::new(ctx)?;
                 let (mut store, linker) = store_for_context(&self.engine, wasi_ctx)?;
 
                 let pre = linker.instantiate_pre(&component)?;
                 let instance = pre.instantiate_async(&mut store).await?;
 
-                containerd_shim_wasm::info!(ctx, "getting component exported function {func:?}");
+                log::info!("getting component exported function {func:?}");
                 let start_func = instance.get_func(&mut store, func).context(format!(
                     "component does not have exported function {func:?}"
                 ))?;
 
-                containerd_shim_wasm::debug!(
-                    ctx,
-                    "running exported function {func:?} {start_func:?}"
-                );
+                log::debug!("running exported function {func:?} {start_func:?}");
                 start_func.call_async(&mut store, &[], &mut []).await
             }
         };
@@ -307,24 +306,21 @@ impl WasmtimeEngineImpl {
     ///
     /// This function adds wasi_preview2 to the linker and can be utilized
     /// to execute a wasm component that uses wasi_preview2.
-    fn execute_component(
+    async fn execute_component(
         &self,
         ctx: &impl RuntimeContext,
         component: Component,
         func: String,
     ) -> Result<i32> {
-        containerd_shim_wasm::debug!(ctx, "loading wasm component");
-
-        wasmtime_wasi::runtime::in_tokio(async move {
-            tokio::select! {
-                status = self.execute_component_async(ctx, component, func) => {
-                    status
-                }
-                status = self.handle_signals() => {
-                    status
-                }
+        log::debug!("loading wasm component");
+        tokio::select! {
+            status = self.execute_component_async(ctx, component, func) => {
+                status
             }
-        })
+            status = self.handle_signals() => {
+                status
+            }
+        }
     }
 
     async fn handle_signals(&self) -> Result<i32> {
@@ -343,27 +339,32 @@ impl WasmtimeEngineImpl {
         wait_for_signal().await
     }
 
-    fn execute(&self, ctx: &impl RuntimeContext, wasm_binary: &[u8], func: String) -> Result<i32> {
+    async fn execute(
+        &self,
+        ctx: &impl RuntimeContext,
+        wasm_binary: &[u8],
+        func: String,
+    ) -> Result<i32> {
         match WasmBinaryType::from_bytes(wasm_binary) {
             Some(WasmBinaryType::Module) => {
-                containerd_shim_wasm::debug!(ctx, "loading wasm module");
+                log::debug!("loading wasm module");
                 let module = Module::from_binary(&self.engine, wasm_binary)?;
-                self.execute_module(ctx, module, &func)
+                self.execute_module(ctx, module, &func).await
             }
             Some(WasmBinaryType::Component) => {
                 let component = Component::from_binary(&self.engine, wasm_binary)?;
-                self.execute_component(ctx, component, func)
+                self.execute_component(ctx, component, func).await
             }
-            None => match &self.engine.detect_precompiled(wasm_binary) {
+            None => match wasmtime::Engine::detect_precompiled(wasm_binary) {
                 Some(Precompiled::Module) => {
-                    containerd_shim_wasm::info!(ctx, "using precompiled module");
+                    log::info!("using precompiled module");
                     let module = unsafe { Module::deserialize(&self.engine, wasm_binary) }?;
-                    self.execute_module(ctx, module, &func)
+                    self.execute_module(ctx, module, &func).await
                 }
                 Some(Precompiled::Component) => {
-                    containerd_shim_wasm::info!(ctx, "using precompiled component");
+                    log::info!("using precompiled component");
                     let component = unsafe { Component::deserialize(&self.engine, wasm_binary) }?;
-                    self.execute_component(ctx, component, func)
+                    self.execute_component(ctx, component, func).await
                 }
                 None => {
                     bail!("invalid precompiled module")
@@ -400,10 +401,10 @@ fn wasi_builder(ctx: &impl RuntimeContext) -> Result<wasi_preview2::WasiCtxBuild
     // TODO: make this more configurable (e.g. allow the user to specify the
     // preopened directories and their permissions)
     // https://github.com/containerd/runwasi/issues/413
-    containerd_shim_wasm::debug!(ctx, "building WASI context");
+    log::debug!("building WASI context");
 
-    let file_perms = wasi_preview2::FilePerms::all();
-    let dir_perms = wasi_preview2::DirPerms::all();
+    let file_perms = wasmtime_wasi::FilePerms::all();
+    let dir_perms = wasmtime_wasi::DirPerms::all();
     let envs = envs_from_ctx(ctx);
 
     let mut builder = wasi_preview2::WasiCtxBuilder::new();
@@ -417,7 +418,7 @@ fn wasi_builder(ctx: &impl RuntimeContext) -> Result<wasi_preview2::WasiCtxBuild
         .allow_ip_name_lookup(true)
         .preopened_dir("/", "/", dir_perms, file_perms)?;
 
-    containerd_shim_wasm::debug!(ctx, "WASI context built successfully");
+    log::debug!("WASI context built successfully");
     Ok(builder)
 }
 
@@ -449,7 +450,7 @@ fn use_pooling_allocator_by_default() -> bool {
         const BITS_TO_TEST: u32 = 42;
         let mut config = Config::new();
         config.wasm_memory64(true);
-        config.static_memory_maximum_size(1 << BITS_TO_TEST);
+        config.memory_reservation(1 << BITS_TO_TEST);
         let Ok(engine) = wasmtime::Engine::new(&config) else {
             return false;
         };

@@ -8,6 +8,7 @@ members = [
     "crates/containerd-shim-wasmtime",
     "crates/containerd-shim-wasmer",
     "crates/containerd-shim-wamr",
+    "crates/containerd-shimkit",
     "crates/stress-test",
     "benches/containerd-shim-benchmarks",
 ]
@@ -25,11 +26,12 @@ homepage = "https://github.com/containerd/runwasi"
 anyhow = "1.0"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 containerd-shim = "0.8"
-containerd-shim-wasm = { path = "crates/containerd-shim-wasm", version = "0.10.0" }
+containerd-shimkit = { path = "crates/containerd-shimkit", version = "0.1.1" }
+containerd-shim-wasm = { path = "crates/containerd-shim-wasm", version = "1.0.0" }
 containerd-shim-wasm-test-modules = { path = "crates/containerd-shim-wasm-test-modules", version = "0.4.0"}
 oci-tar-builder = { path = "crates/oci-tar-builder", version = "0.4.0" }
 env_logger = "0.11"
-libc = "0.2.170"
+libc = "0.2.174"
 libcontainer = { version = "0.5", default-features = false }
 log = "0.4"
 nix = "0.29"
@@ -39,21 +41,21 @@ serde = "1.0"
 serde_json = "1.0"
 sha256 = "1.6.0"
 tar = "0.4"
-tempfile = "3.17"
+tempfile = "3.19"
 thiserror = "2.0"
-wat = "1.226"
+wat = "1.228"
 windows-sys = "0.59"
 serial_test = "3"
 tracing = "0.1"
 hyper = "1.6.0"
-tokio = { version = "1.43.0", default-features = false }
+tokio = { version = "1.45.1", default-features = false }
 tokio-util = { version = "0.7", default-features = false }
 cfg-if = "1.0"
 
 # wasmtime
-wasmtime = { version = "27.0.0", features = ["async"] }
-wasmtime-wasi = { version = "27.0.0" }
-wasmtime-wasi-http = { version = "27.0.0" }
+wasmtime = { version = "33.0.0", features = ["async"] }
+wasmtime-wasi = { version = "33.0.0" }
+wasmtime-wasi-http = { version = "33.0.0" }
 
 [profile.release]
 panic = "abort"

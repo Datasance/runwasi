@@ -1,6 +1,6 @@
-use containerd_shim_wasm::sandbox::cli::{revision, shim_main, version};
-use containerd_shim_wasmtime::WasmtimeInstance;
+use containerd_shim_wasm::shim::Cli;
+use containerd_shim_wasmtime::WasmtimeShim;
 
 fn main() {
-    shim_main::<WasmtimeInstance>("wasmtime", version!(), revision!(), "v1", None);
+    WasmtimeShim::run(None);
 }
